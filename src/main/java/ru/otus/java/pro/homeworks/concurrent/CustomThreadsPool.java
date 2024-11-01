@@ -29,7 +29,10 @@ public class CustomThreadsPool implements ThreadExecutorService {
     @Override
     public void execute(Runnable r) {
         if (isWorking) {
-            tasksQueue.offer(r);
+            synchronized (tasksQueue) {
+                tasksQueue.offer(r);
+                tasksQueue.notifyAll();
+            }
         } else {
             throw new IllegalStateException("Pool is shutdown");
         }

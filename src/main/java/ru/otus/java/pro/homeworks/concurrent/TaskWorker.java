@@ -21,6 +21,14 @@ public class TaskWorker extends Thread {
                 return;
             }
             synchronized (taskQueue) {
+                while (taskQueue.isEmpty()) {
+                    try {
+                        System.out.println("TaskWorker " + getName() + " waiting new task...");
+                        taskQueue.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 task = Optional.ofNullable(taskQueue.poll());
 
             }
