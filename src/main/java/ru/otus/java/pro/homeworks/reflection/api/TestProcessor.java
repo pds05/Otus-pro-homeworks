@@ -17,24 +17,18 @@ public class TestProcessor implements Tester {
     @Override
     public void test() {
         TargetMethods targetMethods = findMethods();
-        Method m0 = targetMethods.getBeforeSuiteMethod();
+        Method beforeSuiteMethod = targetMethods.getBeforeSuiteMethod();
         Object obj;
         try {
             obj = Arrays.stream(testClass.getDeclaredConstructors()).filter(c -> c.getParameterCount() == 0).findFirst().get().newInstance(null);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new TestException("Object " + testClass.getName() + " creation error");
         }
-        if (m0 != null) {
+        if (beforeSuiteMethod != null) {
             try {
-                m0.invoke(obj);
-                result.put(m0, TestResult.OK);
+                beforeSuiteMethod.invoke(obj);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                result.put(m0, TestResult.NOK);
-                e.printStackTrace();
+                throw new TestException("Error invoking " + " method " + testClass.getName() + "." + beforeSuiteMethod.getName());
             }
         }
         Stream.of(targetMethods.getTestMethodMap()).flatMap(methods -> methods.values().stream())
@@ -47,14 +41,12 @@ public class TestProcessor implements Tester {
                         e.printStackTrace();
                     }
                 }));
-        Method m11 = targetMethods.getAfterSuiteMethod();
-        if (m11 != null) {
+        Method afterSuiteMethod = targetMethods.getAfterSuiteMethod();
+        if (afterSuiteMethod != null) {
             try {
-                m11.invoke(obj);
-                result.put(m11, TestResult.OK);
+                afterSuiteMethod.invoke(obj);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                result.put(m11, TestResult.NOK);
-                e.printStackTrace();
+                throw new TestException("Error invoking " + " method " + testClass.getName() + "." + afterSuiteMethod.getName());
             }
         }
 
@@ -67,15 +59,11 @@ public class TestProcessor implements Tester {
     private TargetMethods findMethods() {
         TargetMethods targetMethods = new TargetMethods();
         Method[] methods = testClass.getDeclaredMethods();
+        validate(methods);
 
         for (Method method : methods) {
             if (method.isAnnotationPresent(Test.class)) {
                 int priority = method.getAnnotation(Test.class).priority();
-                if (priority < 1) {
-                    priority = 1;
-                } else if (priority > 10) {
-                    priority = 10;
-                }
                 targetMethods.setTestMethod(priority, method);
             } else if (method.isAnnotationPresent(AfterSuite.class)) {
                 if (targetMethods.getAfterSuiteMethod() == null) {
@@ -88,6 +76,34 @@ public class TestProcessor implements Tester {
             }
         }
         return targetMethods;
+    }
+
+    private void validate(Method[] methods) {
+        int[] countBeforeSuiteMethod = new int[]{0};
+        int[] countAfterSuiteMethod = new int[]{0};
+        int[] countTestMethod = new int[]{0};
+        Stream.of(methods).forEach(method -> {
+            if (method.isAnnotationPresent(BeforeSuite.class)) {
+                countBeforeSuiteMethod[0]++;
+            } else if (method.isAnnotationPresent(AfterSuite.class)) {
+                countAfterSuiteMethod[0]++;
+            } else if (method.isAnnotationPresent(Test.class)) {
+                int priority = method.getAnnotation(Test.class).priority();
+                if (priority < 1 || priority > 10) {
+                    throw new TestException("Invalid Test priority " + priority + " for method " + method.getName() +". Value must be between 1 and 10");
+                }
+                countTestMethod[0]++;
+            }
+        });
+        if (countBeforeSuiteMethod[0] > 1) {
+            throw new TestException("Class " + testClass.getName() + " has more than one BeforeSuite method");
+        }
+        if (countAfterSuiteMethod[0] > 1) {
+            throw new TestException("Class " + testClass.getName() + " has more than one AfterSuite method");
+        }
+        if (countTestMethod[0] == 0) {
+            throw new TestException("Class " + testClass.getName() + " has no Test method");
+        }
     }
 
     class TargetMethods {
