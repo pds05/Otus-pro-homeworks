@@ -83,7 +83,10 @@ public class TestProcessor implements Tester {
         int[] countAfterSuiteMethod = new int[]{0};
         int[] countTestMethod = new int[]{0};
         Stream.of(methods).forEach(method -> {
-            if (method.isAnnotationPresent(BeforeSuite.class)) {
+            if (Arrays.stream(method.getDeclaredAnnotations()).filter(
+                    a ->  a.annotationType()  == BeforeSuite.class || a.annotationType() ==AfterSuite.class).count() == 2) {
+                throw new TestException("Method " + method.getName() + " must be annotated with only once " + BeforeSuite.class.getSimpleName() + " or " + AfterSuite.class.getSimpleName());
+            } else if (method.isAnnotationPresent(BeforeSuite.class)) {
                 countBeforeSuiteMethod[0]++;
             } else if (method.isAnnotationPresent(AfterSuite.class)) {
                 countAfterSuiteMethod[0]++;
