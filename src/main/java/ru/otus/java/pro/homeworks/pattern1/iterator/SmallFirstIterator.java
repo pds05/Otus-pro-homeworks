@@ -11,14 +11,13 @@ public class SmallFirstIterator<T extends Assemble<T>> extends MatryoshkaAbstrac
 
     @Override
     public boolean hasNext() {
-        if (positionWidth >= arr.length || arr[positionWidth] == null) {
-            return false;
+        while (positionWidth < arr.length && arr[positionWidth] != null) {
+            if (arr[positionWidth].amount() > positionDepth) {
+                return true;
+            }
+            positionWidth++;
         }
-        if(arr[positionWidth].amount() > positionDepth){
-            return true;
-        }
-        positionWidth++;
-        return hasNext();
+        return false;
     }
 
     @Override
@@ -32,4 +31,5 @@ public class SmallFirstIterator<T extends Assemble<T>> extends MatryoshkaAbstrac
         }
         return result;
     }
+
 }

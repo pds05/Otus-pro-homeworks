@@ -4,7 +4,7 @@ public class MatryoshkaFactory {
 
     public static Matryoshka create(Matryoshka.Color color, int size) {
         Matryoshka matryoshka = new Matryoshka(color, size);
-        while (size > 0) {
+        if (size > 0) {
             matryoshka.put(create(color, --size));
             return matryoshka;
         }

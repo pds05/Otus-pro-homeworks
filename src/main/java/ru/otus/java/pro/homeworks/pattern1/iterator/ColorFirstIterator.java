@@ -15,10 +15,8 @@ public class ColorFirstIterator<T extends Assemble<T>> extends MatryoshkaAbstrac
 
     @Override
     public T next() {
-        T result = arr[positionWidth].get(positionDepth);
-        if (positionDepth < arr[positionWidth].amount() - 1) {
-            positionDepth++;
-        } else {
+        T result = arr[positionWidth].get(positionDepth++);
+        if (positionDepth >= arr[positionWidth].amount()) {
             positionDepth = 0;
             positionWidth++;
         }
