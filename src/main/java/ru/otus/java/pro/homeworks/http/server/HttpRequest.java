@@ -1,14 +1,14 @@
 package ru.otus.java.pro.homeworks.http.server;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpRequest {
-    private String rawRequest;
     private String uri;
     private HttpMethod httpMethod;
-    private Map<String, String> titles = new HashMap<>();
+    private Map<String, String> headers;
     private Map<String, String> parameters;
     private String body;
 
@@ -17,9 +17,8 @@ public class HttpRequest {
     }
 
     public HttpRequest(String rawRequest, int size) {
-        this.rawRequest = rawRequest;
         if (validate(rawRequest, size)) {
-            this.parse();
+            this.parse(rawRequest);
         } else {
             throw new HttpRequestException("Запрос превышает пределнодопустимый размер " + size + "МБ");
         }
@@ -31,59 +30,67 @@ public class HttpRequest {
         return dataBytes / (unit * unit) <= size;
     }
 
-    private void parse() {
-        int startIndex = rawRequest.indexOf(' ');
-        int endIndex = rawRequest.indexOf(' ', startIndex + 1);
-        this.uri = rawRequest.substring(startIndex + 1, endIndex);
-        String method = rawRequest.substring(0, startIndex);
+    private void parse(String request) {
+        int startUriIndex = request.indexOf(' ');
+        int endUriIndex = request.indexOf(' ', startUriIndex + 1);
+        this.uri = request.substring(startUriIndex + 1, endUriIndex);
         try {
-            this.httpMethod = HttpMethod.valueOf(method);
+            this.httpMethod = HttpMethod.valueOf(request.substring(0, startUriIndex));
         } catch (IllegalArgumentException e) {
-            throw new HttpRequestException("Invalid method " + method);
+            throw new HttpRequestException("Invalid method");
         }
-        this.parameters = new HashMap<>();
         if (uri.contains("?")) {
-            String[] elements = uri.split("[?]");
-            this.uri = elements[0];
-            String[] keysValues = elements[1].split("&");
-            for (String o : keysValues) {
-                String[] keyValue = o.split("=");
-                this.parameters.put(keyValue[0], keyValue[1]);
+            int startParamIndex = uri.indexOf('?') + 1;
+            try {
+                this.parameters = Arrays.stream(
+                                uri.substring(startParamIndex)
+                                        .split("&"))
+                        .map(p -> p.split("="))
+                        .collect(Collectors.toMap(p -> p[0], v -> v[1]));
+            } catch (Exception e) {
+                throw new HttpRequestException("Invalid parameters");
             }
         }
-        int startHeaderIndex = rawRequest.indexOf("\r\n") + 2;
-        int endHeaderIndex = rawRequest.indexOf("\r\n\r\n");
-        String[] titlesValues = rawRequest.substring(startHeaderIndex, endHeaderIndex).split("\\r\\n");
-        for (int i = 1; i < titlesValues.length; i++) {
-            String[] titleValue = titlesValues[i].split(": ");
-            this.titles.put(titleValue[0], titleValue[1]);
+        int startHeaderIndex = request.indexOf("\r\n") + 2;
+        int endHeaderIndex = request.indexOf("\r\n\r\n");
+        try {
+            headers = request.substring(startHeaderIndex, endHeaderIndex).lines()
+                    .map(line -> line.split(": ", 2))
+                    .collect(Collectors.toMap(h -> h[0], v -> v[1]));
+        } catch (Exception e) {
+            throw new HttpRequestException("Invalid headers");
         }
-        this.body = rawRequest.substring(endHeaderIndex + 4);
+        this.body = request.substring(endHeaderIndex + 4);
     }
 
-    public boolean containsParameter(String key) {
-        return parameters.containsKey(key);
+    public Map<String, String> getParameters() {
+        return parameters;
     }
 
-    public String getParameter(String key) {
-        return parameters.get(key);
+    public String getParameter(String name) {
+        return parameters != null ? parameters.get(name) : null;
     }
 
-    public String getTitle(String key) {
-        return titles.get(key);
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public String getHeader(String key) {
+        return headers != null ? headers.get(key) : null;
     }
 
     public String getBody() {
         return body;
     }
 
-    public void printInfo(boolean showRawRequest) {
-        System.out.println("uri: " + uri);
-        System.out.println("method: " + httpMethod);
-        System.out.println("parameters: " + parameters);
-        System.out.println("titles: " + titles);
-        if (showRawRequest) {
-            System.out.println(rawRequest);
-        }
+    @Override
+    public String toString() {
+        return "HttpRequest{" +
+                "uri='" + uri + '\'' +
+                ", httpMethod=" + httpMethod +
+                ", headers=" + headers +
+                ", parameters=" + parameters +
+                ", body='" + body + '\'' +
+                '}';
     }
 }

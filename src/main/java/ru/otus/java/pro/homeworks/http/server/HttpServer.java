@@ -46,7 +46,7 @@ public class HttpServer {
                         try {
                             HttpRequest httpRequest = new HttpRequest(rawRequest, maxSize);
                             goodResponse(outputStream);
-                            httpRequest.printInfo(true);
+                            System.out.println(httpRequest);
                             if (httpRequest.getUri().equalsIgnoreCase("/shutdown")) {
                                 shutdown();
                             }
