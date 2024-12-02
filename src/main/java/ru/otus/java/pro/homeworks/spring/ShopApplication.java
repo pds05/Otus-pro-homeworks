@@ -18,18 +18,23 @@ public class ShopApplication {
 
         System.out.println("Updated repository: " + repository.getAll());
 
-        Cart cart = context.getBean(Cart.class);
-        cart.addProduct(1L);
-        cart.addProduct(2L);
-        cart.addProduct(11L);
+        Cart cart1 = context.getBean(Cart.class);
+        cart1.addProduct(1L);
+        cart1.addProduct(2L);
+        cart1.addProduct(11L);
 
-        System.out.println("Full cart: " + cart.getProducts());
+        Cart cart2 = context.getBean(Cart.class);
 
-        cart.removeProduct(2L);
-        System.out.println("Removed product from cart: " + cart.getProducts());
+        System.out.println("Identity equal cart1 and cart2 - " + (cart1 == cart2));
+        System.out.println("Value equal cart1 and cart2 - " + cart1.equals(cart2));
+        System.out.println("Cart1: " + cart1.getProducts());
+        System.out.println("Cart2: " + cart2.getProducts());
 
-        cart.removeAll();
-        System.out.println("Empty cart: " + cart.getProducts());
+        cart1.removeProduct(2L);
+        System.out.println("Removed product from cart1: " + cart1.getProducts());
+
+        cart1.removeAll();
+        System.out.println("Empty cart1: " + cart1.getProducts());
 
         System.out.println("Repository: " + repository.getAll());
     }

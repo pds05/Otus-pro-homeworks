@@ -35,6 +35,7 @@ public class ShopConfiguration {
         ));
     }
 
+    @Scope("prototype")
     @Bean
     public List<Product> cartProducts() {
         return new ArrayList<>();
