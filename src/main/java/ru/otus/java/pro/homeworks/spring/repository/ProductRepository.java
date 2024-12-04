@@ -21,12 +21,15 @@ public class ProductRepository implements SimpleRepository<Product> {
 
     @Override
     public Product get(long id) {
-        return repositoryProducts.stream().filter(product -> product.getId() == id).findFirst().orElse(null);
+        return repositoryProducts.stream()
+                .filter(product -> product.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public Product add(Product entity) {
-        entity.setId(++counter);
+        entity.setId((long) ++counter);
         repositoryProducts.add(entity);
         return entity;
     }

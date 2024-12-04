@@ -9,11 +9,12 @@ import java.util.Objects;
 
 
 public class Cart {
-    @Autowired
+
     private SimpleRepository<Product> repository;
-    @Autowired
+
     private List<Product> cartProducts;
 
+    @Autowired
     public Cart(SimpleRepository<Product> repository) {
         this.repository = repository;
     }
@@ -23,7 +24,10 @@ public class Cart {
     }
 
     public void removeProduct(long productId) {
-        cartProducts.remove(repository.get(productId));
+        Product product = repository.get(productId);
+        if (product != null) {
+            cartProducts.remove(product);
+        }
     }
 
     public void removeAll() {

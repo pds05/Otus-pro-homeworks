@@ -24,6 +24,7 @@ public class ShopApplication {
         cart1.addProduct(11L);
 
         Cart cart2 = context.getBean(Cart.class);
+        cart2.addProduct(5L);
 
         System.out.println("Identity equal cart1 and cart2 - " + (cart1 == cart2));
         System.out.println("Value equal cart1 and cart2 - " + cart1.equals(cart2));
