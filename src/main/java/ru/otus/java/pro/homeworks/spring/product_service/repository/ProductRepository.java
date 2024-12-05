@@ -36,7 +36,7 @@ public class ProductRepository implements SimpleRepository<Product> {
 
     @Override
     public Product update(Product entity) {
-        Product exist = get(entity.getId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Product exist = get(entity.getId()).orElseThrow(() -> new ResourceNotFoundException("Product not found with id=" + entity.getId()));
         return repositoryProducts.set(repositoryProducts.indexOf(exist), entity);
     }
 

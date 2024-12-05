@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.java.pro.homeworks.spring.product_service.dto.ProductDto;
 import ru.otus.java.pro.homeworks.spring.product_service.entity.Product;
+import ru.otus.java.pro.homeworks.spring.product_service.exception.ResourceNotFoundException;
 import ru.otus.java.pro.homeworks.spring.product_service.service.ProductService;
 
 import java.util.List;
@@ -18,7 +19,6 @@ public class WindowController {
 
     @GetMapping
     public List<ProductDto> getAllProducts() {
-
         return productService.findAll().stream().map(product -> ProductDto.builder()
                 .id(product.getId())
                 .title(product.getTitle())
@@ -26,41 +26,46 @@ public class WindowController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> getProductById(@PathVariable long id) {
+    public ProductDto getProductById(@PathVariable long id) {
         return productService.findById(id)
-                .map(product -> new ResponseEntity<>(
-                        ProductDto.builder()
-                                .id(product.getId())
-                                .title(product.getTitle())
-                                .price(product.getPrice())
-                                .build(), HttpStatus.OK)
-                ).orElse(ResponseEntity.notFound().build());
+                .map(product -> ProductDto.builder()
+                        .id(product.getId())
+                        .title(product.getTitle())
+                        .price(product.getPrice())
+                        .build()
+                ).orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found"));
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/add")
-    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+    public ProductDto createProduct(@RequestBody ProductDto productDto) {
         Product product = productService.save(
                 Product.builder()
                         .title(productDto.getTitle())
                         .price(productDto.getPrice())
                         .build());
         productDto.setId(product.getId());
-        return new ResponseEntity<>(productDto, HttpStatus.CREATED);
+        return productDto;
     }
 
     @PutMapping("/update")
-    public ProductDto updateProduct(@RequestBody ProductDto productDto) {
+    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDto) {
         Product updatingProduct = Product.builder()
                 .id(productDto.getId())
                 .title(productDto.getTitle())
                 .price(productDto.getPrice()).build();
-        productService.update(updatingProduct);
-        return productDto;
+        Product result = productService.update(updatingProduct);
+        if (result.getId().equals(productDto.getId())) {
+            return new ResponseEntity<>(productDto, HttpStatus.OK);
+        } else {
+            productDto.setId(result.getId());
+            return new ResponseEntity<>(productDto, HttpStatus.CREATED);
+        }
     }
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @DeleteMapping("/delete")
-    public ResponseEntity<HttpStatus> deleteProduct(@RequestParam long id) {
+    public void deleteProduct(@RequestParam long id) {
         productService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

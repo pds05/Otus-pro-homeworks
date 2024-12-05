@@ -27,12 +27,12 @@ public class ProductService {
     }
 
     public Product update(Product product) {
-        productRepository.get(product.getId())
-                .ifPresentOrElse(
-                        entity -> productRepository.update(product)
-                        , () -> productRepository.add(product)
-                );
-        return product;
+        Optional<Product> exist = productRepository.get(product.getId());
+        if (exist.isPresent()) {
+            return productRepository.update(product);
+        } else {
+            return productRepository.add(product);
+        }
     }
 
     public void deleteById(Long id) {
