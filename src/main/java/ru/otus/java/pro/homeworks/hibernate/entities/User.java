@@ -28,7 +28,14 @@ import java.util.Set;
                 name = "User.findByPhoneNumberOrEmail",
                 query = "from User u " +
                         "join fetch u.userContact uc " +
-                        "where uc.phoneNumber = ?1 or uc.email = ?2")
+                        "where uc.phoneNumber = ?1 or uc.email = ?2"),
+        @NamedQuery(
+                name = "User.findByProductId",
+                query = "select distinct u from User u " +
+                        "join Order o on o.user = u " +
+                        "join OrdersProduct op on op.order = o " +
+                        "where op.product.id = :productId"
+        )
 })
 @NamedEntityGraph(
         name = "User.orders",
@@ -38,8 +45,8 @@ import java.util.Set;
         subgraphs = {@NamedSubgraph(
                 name = "User.Order.ordersProducts",
                 attributeNodes = @NamedAttributeNode(Order_.ORDERS_PRODUCTS)),
-        @NamedSubgraph(name = "User.Order.OrderProduct",
-                attributeNodes = @NamedAttributeNode(OrdersProduct_.PRODUCT))
+                @NamedSubgraph(name = "User.Order.OrderProduct",
+                        attributeNodes = @NamedAttributeNode(OrdersProduct_.PRODUCT))
         })
 @Entity
 @Table(name = "USERS", schema = "PRODUCTS_STORE")

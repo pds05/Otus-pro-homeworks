@@ -115,7 +115,6 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
-
     @Override
     public void delete(long userId) {
         Session session = sessionFactory.getCurrentSession();
@@ -131,5 +130,15 @@ public class UserDaoImpl implements UserDao {
             logger.error("Failed to delete userId={}", userId, e);
             throw new ApplicationException("Failed to delete user");
         }
+    }
+
+    public List<User> findByOrdersProductId(long productId) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        List<User> users = session.createNamedQuery("User.findByProductId", User.class)
+                .setParameter("productId", productId)
+                .list();
+        session.getTransaction().commit();
+        return users;
     }
 }

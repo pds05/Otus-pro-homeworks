@@ -10,6 +10,7 @@ import ru.otus.java.pro.homeworks.hibernate.dtos.OrderDto;
 import ru.otus.java.pro.homeworks.hibernate.dtos.ProductDto;
 import ru.otus.java.pro.homeworks.hibernate.dtos.UserProfileDto;
 import ru.otus.java.pro.homeworks.hibernate.exceptions.ApplicationException;
+import ru.otus.java.pro.homeworks.hibernate.services.ManagerService;
 import ru.otus.java.pro.homeworks.hibernate.services.StoreService;
 import ru.otus.java.pro.homeworks.hibernate.services.UserService;
 
@@ -43,7 +44,7 @@ public class MyStoreApp {
             logger.info("Users basket size={}, products={}", basket.getProducts().size(), basket.getProducts());
             storeService.makeOrder(user.getUserId());
 
-            storeService.addProductToBasket(user.getUserId(), fruits.get(1).getProductId(), 5);
+            storeService.addProductToBasket(user.getUserId(), fruits.get(1).getProductId(), 4);
             basket = storeService.viewBasket(user.getUserId());
             logger.info("Users basket size={}, products={}", basket.getProducts().size(), basket.getProducts());
             storeService.makeOrder(user.getUserId());
@@ -54,6 +55,17 @@ public class MyStoreApp {
             userService.removeOrder(user.getUserId(), orders.get(0).getOrderId());
             orders = userService.getOrders(user.getUserId());
             logger.info("Users orders after 1st removed size={}, products={}", orders.size(), orders);
+
+            UserProfileDto user2 = userService.login("Вася", "123");
+            ProductDto product = fruits.get(1);
+            logger.info("Found product: {}", product);
+            storeService.addProductToBasket(user2.getUserId(), product.getProductId(), 1);
+            storeService.makeOrder(user2.getUserId());
+
+            ManagerService managerService = new ManagerService(userDao, productDao, null);
+            logger.info("Users with same product {} in orders: {}",
+                    product.getTitle(),
+                    managerService.findUsersByProduct(product.getProductId()));
         } catch (ApplicationException e) {
             logger.error(e.getMessage());
         }

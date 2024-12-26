@@ -11,9 +11,11 @@ import ru.otus.java.pro.homeworks.hibernate.daos.UserDao;
 import ru.otus.java.pro.homeworks.hibernate.dtos.ProductDto;
 import ru.otus.java.pro.homeworks.hibernate.dtos.ProductTypeDto;
 import ru.otus.java.pro.homeworks.hibernate.dtos.PromotionDto;
+import ru.otus.java.pro.homeworks.hibernate.dtos.UserProfileDto;
 import ru.otus.java.pro.homeworks.hibernate.entities.Product;
 import ru.otus.java.pro.homeworks.hibernate.entities.ProductType;
 import ru.otus.java.pro.homeworks.hibernate.entities.Promotion;
+import ru.otus.java.pro.homeworks.hibernate.entities.User;
 import ru.otus.java.pro.homeworks.hibernate.exceptions.ApplicationException;
 import ru.otus.java.pro.homeworks.hibernate.util.EntityDtoMapper;
 
@@ -144,5 +146,10 @@ public class ManagerService {
         });
         promotionDao.update(promotion);
         logger.info("Removed products {} from promotion, updated promotion {}", productIds, promotion);
+    }
+
+    public List<UserProfileDto> findUsersByProduct(long productId) {
+        List<User> users = userDao.findByOrdersProductId(productId);
+        return users.stream().map(EntityDtoMapper::map).toList();
     }
 }
