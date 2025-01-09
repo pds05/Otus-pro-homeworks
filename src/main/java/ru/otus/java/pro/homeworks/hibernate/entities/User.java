@@ -39,13 +39,20 @@ import java.util.Set;
 })
 @NamedEntityGraph(
         name = "User.orders",
-        attributeNodes = @NamedAttributeNode(
-                value = User_.ORDERS,
-                subgraph = "User.Order.ordersProducts"),
-        subgraphs = {@NamedSubgraph(
-                name = "User.Order.ordersProducts",
-                attributeNodes = @NamedAttributeNode(Order_.ORDERS_PRODUCTS)),
-                @NamedSubgraph(name = "User.Order.OrderProduct",
+        attributeNodes = {
+                @NamedAttributeNode(User_.USER_CONTACT),
+                @NamedAttributeNode(
+                        value = User_.ORDERS,
+                        subgraph = "User.Order.ordersProducts"
+                )},
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "User.Order.ordersProducts",
+                        attributeNodes = @NamedAttributeNode(
+                                value = Order_.ORDERS_PRODUCTS,
+                                subgraph = "User.Order.OrdersProduct.product")),
+                @NamedSubgraph(
+                        name = "User.Order.OrdersProduct.product",
                         attributeNodes = @NamedAttributeNode(OrdersProduct_.PRODUCT))
         })
 @Entity
@@ -65,7 +72,6 @@ public class User {
     @Column(name = "PASSWORD", nullable = false, length = 10)
     private String password;
 
-    @ToString.Exclude
     @OneToMany(mappedBy = Order_.USER, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Order> orders = new LinkedHashSet<>();
 

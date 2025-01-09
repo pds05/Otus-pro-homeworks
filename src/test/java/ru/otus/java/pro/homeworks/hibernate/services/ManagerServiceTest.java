@@ -133,9 +133,17 @@ public class ManagerServiceTest {
     public void removeProduct() {
         ProductDto product = managerService.findProductByTitle("Говядина");
         managerService.removeProduct(product.getProductId());
+        assertThatThrownBy(() -> managerService.findProductByTitle(product.getTitle()))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessageContaining("Product not found");
+
 
         ProductDto product2 = managerService.findProductByTitle("Конфеты");
-        managerService.removeProduct(product2.getProductId(), 5);
+        int quantity = product2.getQuantity();
+        int removeQuantity = 5;
+        managerService.removeProduct(product2.getProductId(), removeQuantity);
+        product2 = managerService.findProductByTitle(product2.getTitle());
+        assertEquals(quantity - removeQuantity, product2.getQuantity());
     }
 
     @AfterAll

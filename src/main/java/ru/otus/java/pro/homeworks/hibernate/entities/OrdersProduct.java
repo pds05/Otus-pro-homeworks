@@ -39,6 +39,7 @@ public class OrdersProduct {
     @Column(name = "PRICE_TYPE", nullable = false)
     private PriceType priceType;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROMOTION_ID", updatable = false, insertable = false)
     private Promotion promotion;

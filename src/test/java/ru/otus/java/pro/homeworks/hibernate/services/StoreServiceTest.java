@@ -6,6 +6,7 @@ import ru.otus.java.pro.homeworks.hibernate.config.SessionFactoryConfigurator;
 import ru.otus.java.pro.homeworks.hibernate.daos.*;
 import ru.otus.java.pro.homeworks.hibernate.dtos.*;
 import ru.otus.java.pro.homeworks.hibernate.entities.Product;
+import ru.otus.java.pro.homeworks.hibernate.entities.User;
 
 import java.util.List;
 
@@ -115,11 +116,22 @@ public class StoreServiceTest {
     @Order(4)
     @Test
     public void findOrder() {
-        List<OrderDto> orders = userService.getOrders(userService.getProfile(1).getUserId());
+        List<OrderDto> orders = userService.getOrders(1);
         OrderDto order = orders.stream()
                 .filter(o -> o.getProductByTitle("Хлеб") != null)
-                .findFirst().get();
+                .findFirst().orElse(null);
+        assertNotNull(order);
+        assertEquals(4, order.getProducts().size());
         System.out.println(order);
+    }
+
+    @Order(5)
+    @Test
+    public void findUserWithOrder() {
+        User user = userService.getUserDao().findByIdWithData(1).orElse(null);
+        assertNotNull(user);
+        assertEquals(1, user.getOrders().size());
+        System.out.println(user);
     }
 
     @AfterAll

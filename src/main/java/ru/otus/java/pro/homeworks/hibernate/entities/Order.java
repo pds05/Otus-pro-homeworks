@@ -27,7 +27,9 @@ import java.util.Set;
 })
 @NamedEntityGraph(
         name = "Order.ordersProducts",
-        attributeNodes = @NamedAttributeNode(Order_.ORDERS_PRODUCTS),
+        attributeNodes = @NamedAttributeNode(
+                value = Order_.ORDERS_PRODUCTS,
+                subgraph = "Order.UserProduct.product"),
         subgraphs = @NamedSubgraph(
                 name = "Order.UserProduct.product",
                 attributeNodes = @NamedAttributeNode(OrdersProduct_.PRODUCT))

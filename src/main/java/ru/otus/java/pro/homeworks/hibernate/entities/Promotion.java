@@ -23,8 +23,9 @@ import java.util.Set;
         attributeNodes = @NamedAttributeNode(
                 value = Promotion_.PRODUCTS,
                 subgraph = "Promotion.Product.type"),
-        subgraphs = {@NamedSubgraph(name = "Promotion.Product.type",
-                attributeNodes = @NamedAttributeNode(Product_.TYPE))})
+        subgraphs = @NamedSubgraph(
+                name = "Promotion.Product.type",
+                attributeNodes = @NamedAttributeNode(Product_.TYPE)))
 @Entity
 @Table(name = "PROMOTIONS", schema = "PRODUCTS_STORE")
 public class Promotion {
