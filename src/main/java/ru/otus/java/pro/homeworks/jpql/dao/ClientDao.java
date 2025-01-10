@@ -25,7 +25,7 @@ public class ClientDao implements CrudDao<Client> {
 
     @Override
     public Client create(Client client) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         try {
             session.beginTransaction();
             session.persist(client);
@@ -41,7 +41,7 @@ public class ClientDao implements CrudDao<Client> {
 
     @Override
     public Client update(Client client) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         try {
             session.beginTransaction();
             Client mergedClient = session.merge(client);
@@ -58,7 +58,7 @@ public class ClientDao implements CrudDao<Client> {
 
     @Override
     public Optional<Client> findById(int id) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         RootGraph<Client> graph = session.createEntityGraph(Client.class, "Client.phones");
         Optional<Client> client = session.byId(Client.class)
@@ -70,7 +70,7 @@ public class ClientDao implements CrudDao<Client> {
 
     @Override
     public List<Client> findAll() {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         List<Client> clients = session.createQuery("from Client", Client.class).list();
         session.getTransaction().commit();
@@ -79,7 +79,7 @@ public class ClientDao implements CrudDao<Client> {
 
     @Override
     public void delete(int id) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         try {
             session.beginTransaction();
             MutationQuery query = session.createMutationQuery("delete from Client where id = :id");

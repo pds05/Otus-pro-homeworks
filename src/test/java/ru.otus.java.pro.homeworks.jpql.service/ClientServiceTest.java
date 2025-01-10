@@ -23,6 +23,14 @@ public class ClientServiceTest {
         clientService.register("Вася", "Ломоносова", "79998880080");
         clientService.register("Коля", "Гагарина", "79997770070", "79997770071");
         clientService.register("Миша", "Победы", "79991112220", "79991112221", "79991112223");
+
+        long openedSession = clientService.getDao().getSessionFactory().getStatistics().getSessionOpenCount();
+        long closedSession = clientService.getDao().getSessionFactory().getStatistics().getSessionCloseCount();
+        System.out.println("openedSession=" + openedSession);
+        System.out.println("closedSession=" + closedSession);
+
+        assertEquals(3, openedSession);
+        assertEquals(3, closedSession);
         assertEquals(3, clientService.getAllClients().size());
 
         Client client = clientService.getClient(1);

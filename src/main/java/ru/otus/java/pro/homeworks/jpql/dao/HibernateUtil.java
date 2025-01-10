@@ -21,6 +21,7 @@ public class HibernateUtil {
                     .buildSessionFactory();
             logger.info("Session factory created");
         }
+        sessionFactory.getStatistics().setStatisticsEnabled(true);
         return sessionFactory;
     }
 
