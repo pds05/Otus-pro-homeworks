@@ -36,7 +36,10 @@ import java.util.Set;
 })
 @NamedEntityGraph(
         name = "Product.promotions",
-        attributeNodes = @NamedAttributeNode(Product_.PROMOTIONS))
+        attributeNodes = {
+                @NamedAttributeNode(Product_.PROMOTIONS),
+                @NamedAttributeNode(Product_.TYPE)
+        })
 @Entity
 @Table(name = "PRODUCTS", schema = "PRODUCTS_STORE")
 public class Product {

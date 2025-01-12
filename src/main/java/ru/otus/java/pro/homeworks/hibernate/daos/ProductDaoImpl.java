@@ -28,7 +28,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Optional<Product> findById(long id) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         EntityGraph<?> graph = session.createEntityGraph("Product.promotions");
         Optional<Product> product = session.createQuery("from Product where id = :id", Product.class)
@@ -41,7 +41,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public List<Product> findByProductType(String productType) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         RootGraph<Product> graph = session.createEntityGraph(Product.class, "Product.promotions");
         List<Product> products = session.createNamedQuery("Product.findByProductTypeTitle", Product.class)
@@ -54,7 +54,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Optional<Product> findByTitle(String title) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         Optional<Product> product = session.createNamedQuery("Product.findByTitleWithData", Product.class)
                 .setParameter("title", "%" + title + "%")
@@ -65,7 +65,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public List<ProductType> findProductTypes() {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         List<ProductType> productTypes = session.createQuery("from ProductType", ProductType.class)
                 .list();
@@ -75,7 +75,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Optional<ProductType> findProductTypeByTitle(String title) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         Optional<ProductType> productType = session.createNamedQuery("ProductType.findByTitleWithData", ProductType.class)
                 .setParameter("title", title)
@@ -86,7 +86,7 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public List<Product> findAll() {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         List<Product> products = session.createNamedQuery("Product.findAllWithData", Product.class)
                 .getResultList();

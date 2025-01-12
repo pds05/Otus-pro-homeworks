@@ -26,7 +26,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Optional<Order> findById(long id) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         EntityGraph<?> graph = session.createEntityGraph("Order.ordersProducts");
         Optional<Order> order = session.createQuery("from Order where id = :id", Order.class)
@@ -39,7 +39,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> findAll() {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         List<Order> orders = session.createNamedQuery("Order.findAllWithData", Order.class)
                 .getResultList();
@@ -49,7 +49,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> findAllByUserId(long userId) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         RootGraph<Order> graph = session.createEntityGraph(Order.class, "Order.ordersProducts");
         List<Order> orders = session.createNamedQuery("Order.findByUserId", Order.class)

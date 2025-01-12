@@ -133,7 +133,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     public List<User> findByOrdersProductId(long productId) {
-        Session session = sessionFactory.openSession();
+        Session session = sessionFactory.getCurrentSession();
         session.beginTransaction();
         List<User> users = session.createNamedQuery("User.findByProductId", User.class)
                 .setParameter("productId", productId)

@@ -53,7 +53,12 @@ import java.util.Set;
                                 subgraph = "User.Order.OrdersProduct.product")),
                 @NamedSubgraph(
                         name = "User.Order.OrdersProduct.product",
-                        attributeNodes = @NamedAttributeNode(OrdersProduct_.PRODUCT))
+                        attributeNodes = @NamedAttributeNode(
+                                value = OrdersProduct_.PRODUCT,
+                                subgraph = "User.Order.OrdersProduct.Product.type")),
+                @NamedSubgraph(
+                        name = "User.Order.OrdersProduct.Product.type",
+                        attributeNodes = @NamedAttributeNode(Product_.TYPE))
         })
 @Entity
 @Table(name = "USERS", schema = "PRODUCTS_STORE")
