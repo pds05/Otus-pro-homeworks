@@ -72,6 +72,7 @@ public class User {
     @Column(name = "PASSWORD", nullable = false, length = 10)
     private String password;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = Order_.USER, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Order> orders = new LinkedHashSet<>();
 

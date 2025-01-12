@@ -131,7 +131,7 @@ public class StoreServiceTest {
         User user = userService.getUserDao().findByIdWithData(1).orElse(null);
         assertNotNull(user);
         assertEquals(1, user.getOrders().size());
-        System.out.println(user);
+        System.out.println("user=" + user + "\r\norders=" + user.getOrders());
     }
 
     @AfterAll
