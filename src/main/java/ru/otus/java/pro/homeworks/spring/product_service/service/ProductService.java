@@ -1,42 +1,76 @@
 package ru.otus.java.pro.homeworks.spring.product_service.service;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.java.pro.homeworks.spring.product_service.entity.Product;
+import ru.otus.java.pro.homeworks.spring.product_service.entity.ProductCategory;
+import ru.otus.java.pro.homeworks.spring.product_service.entity.ProductDetails;
+import ru.otus.java.pro.homeworks.spring.product_service.exception.BadRequestException;
 import ru.otus.java.pro.homeworks.spring.product_service.exception.ResourceNotFoundException;
-import ru.otus.java.pro.homeworks.spring.product_service.repository.ProductRepository;
+import ru.otus.java.pro.homeworks.spring.product_service.repository.ProductCategoriesRepository;
+import ru.otus.java.pro.homeworks.spring.product_service.repository.ProductDetailsRepository;
+import ru.otus.java.pro.homeworks.spring.product_service.repository.ProductsRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Getter
+@Setter
 @RequiredArgsConstructor
+@Service
 public class ProductService {
-    private final ProductRepository productRepository;
+    private final ProductsRepository productsRepository;
+    private final ProductDetailsRepository productDetailsRepository;
+    private final ProductCategoriesRepository categoriesRepository;
 
-    public List<Product> findAll() {
-        return productRepository.getAll();
+    @Transactional
+    public List<Product> getProducts() {
+        return productsRepository.findAllWithDetails();
     }
 
-    public Optional<Product> findById(Long id) {
-        return productRepository.get(id);
+    @Transactional
+    public Optional<ProductCategory> getProductCategory(String title) {
+        return categoriesRepository.findByTitle(title);
     }
 
+    @Transactional
+    public Optional<Product> getProduct(String title) {
+        return productsRepository.findByTitleWithDetail(title);
+    }
+
+    @Transactional
+    public Optional<Product> getProduct(Long id) {
+        return productsRepository.findByIdWithDetail(id);
+    }
+
+    @Transactional
     public Product save(Product product) {
-        return productRepository.add(product);
+        Product savedProduct = productsRepository.save(product);
+        ProductDetails details = product.getDetails();
+        details.setProductId(savedProduct.getId());
+        ProductDetails savedDetails = productDetailsRepository.save(details);
+        savedProduct.setDetails(savedDetails);
+        savedProduct.setCategory(categoriesRepository.findById(product.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category id " + product.getCategoryId() + " not found")));
+        return savedProduct;
     }
 
+    @Transactional
     public Product update(Product product) {
-        Optional<Product> exist = productRepository.get(product.getId());
-        if (exist.isPresent()) {
-            return productRepository.update(product);
-        } else {
-            return productRepository.add(product);
-        }
+        if (product.getId() == null) throw new BadRequestException("'id' parameter not found");
+        Product oldProduct = productsRepository.findByIdWithDetail(product.getId()).orElseThrow(() -> new ResourceNotFoundException("Product id " + product.getId() + " not found"));
+        oldProduct.update(product);
+        Product newProduct = productsRepository.save(oldProduct);
+        ProductDetails details = productDetailsRepository.save(oldProduct.getDetails());
+        newProduct.setDetails(details);
+        return newProduct;
     }
 
-    public void deleteById(Long id) {
-        Product product = productRepository.get(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id=" + id));
-        productRepository.delete(product);
+    @Transactional
+    public void deleteProduct(Long id) {
+        productsRepository.deleteById(id);
     }
 }
