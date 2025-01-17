@@ -24,7 +24,6 @@ public class Product {
     @Column("CATEGORY_ID")
     private Long categoryId;
     @Transient
-    @Column("CATEGORY_ID")
     private ProductCategory category;
     @Column("TITLE")
     private String title;

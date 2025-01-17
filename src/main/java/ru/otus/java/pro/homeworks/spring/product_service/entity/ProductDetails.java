@@ -29,13 +29,9 @@ public class ProductDetails {
     private LocalDateTime deliveryDate;
 
     public void setDeliveryDate(String deliveryDate) {
-        if (deliveryDate != null && !deliveryDate.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DELIVERY_DATETIME_FORMAT);
-            this.deliveryDate = LocalDateTime.parse(deliveryDate, formatter);
-        } else {
-            this.deliveryDate = LocalDateTime.now();
-        }
-
+        this.deliveryDate = (deliveryDate != null && !deliveryDate.isEmpty()) ?
+                LocalDateTime.parse(deliveryDate, DateTimeFormatter.ofPattern(DELIVERY_DATETIME_FORMAT)) :
+                LocalDateTime.now();
     }
 
     public String getDeliveryDate() {

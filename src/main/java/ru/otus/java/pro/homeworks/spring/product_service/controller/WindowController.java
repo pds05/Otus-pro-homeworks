@@ -1,6 +1,5 @@
 package ru.otus.java.pro.homeworks.spring.product_service.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,12 +15,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@RequiredArgsConstructor
 public class WindowController {
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final ModelMapper modelMapper;
+
+    @Autowired
+    public WindowController(ProductService productService, ModelMapper modelMapper) {
+        this.productService = productService;
+        this.modelMapper = modelMapper;
+    }
 
     @GetMapping
     public List<ProductDto> getAllProducts() {
@@ -44,11 +46,10 @@ public class WindowController {
     @PutMapping("/update")
     public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDto) {
         Product product = productService.update(convertToEntity(productDto));
-        if (productDto.getId() != null) {
-            return ResponseEntity.ok(convertToDto(product));
-        } else {
-            return new ResponseEntity<>(convertToDto(product),HttpStatus.CREATED);
-        }
+        return productDto.getId() != null ?
+                ResponseEntity.ok(convertToDto(product)) :
+                new ResponseEntity<>(convertToDto(product), HttpStatus.CREATED);
+
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -67,7 +68,7 @@ public class WindowController {
             product.setDetails(details);
         }
         if (productDto.getCategoryTitle() != null) {
-            product.setCategoryId(productService.getProductCategory(productDto.getCategoryTitle()).orElseThrow(() -> new ResourceNotFoundException("Category " +  productDto.getCategoryTitle() +  " not found")).getId());
+            product.setCategoryId(productService.getProductCategory(productDto.getCategoryTitle()).orElseThrow(() -> new ResourceNotFoundException("Category " + productDto.getCategoryTitle() + " not found")).getId());
         }
         return product;
     }

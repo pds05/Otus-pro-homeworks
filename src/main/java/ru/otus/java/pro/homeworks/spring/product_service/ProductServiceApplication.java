@@ -21,7 +21,11 @@ public class ProductServiceApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("Products: {}", productsRepository.findAllWithDetails());
+        try {
+            logger.info("Products: {}", productsRepository.findAllWithDetails());
+        } catch (Exception e) {
+            logger.error("An error occurred while fetching products: ", e);
+        }
     }
 
     public static void main(String[] args) {
