@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -12,4 +14,11 @@ import lombok.Setter;
 public class ErrorDto {
     private int statusCode;
     private String message;
+    private LocalDateTime dateTime;
+
+    public ErrorDto(int statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.dateTime = LocalDateTime.now();
+    }
 }
