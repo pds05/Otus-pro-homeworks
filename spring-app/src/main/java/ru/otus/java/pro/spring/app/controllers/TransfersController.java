@@ -1,6 +1,7 @@
 package ru.otus.java.pro.spring.app.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.java.pro.spring.app.dtos.ExecuteTransferDtoRq;
 import ru.otus.java.pro.spring.app.dtos.TransferDto;
@@ -35,8 +36,9 @@ public class TransfersController {
         return ENTITY_TO_DTO.apply(transfersService.getTransferById(id, clientId).orElseThrow(() -> new ResourceNotFoundException("Перевод не найден")));
     }
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping
-    public void executeTransfer(@RequestHeader(name = "client-id") String clientId, @RequestBody ExecuteTransferDtoRq executeTransferDtoRq) {
-        transfersService.execute(clientId, executeTransferDtoRq);
+    public TransferDto executeTransfer(@RequestHeader(name = "client-id") String clientId, @RequestBody ExecuteTransferDtoRq executeTransferDtoRq) {
+        return ENTITY_TO_DTO.apply(transfersService.execute(clientId, executeTransferDtoRq));
     }
 }

@@ -20,13 +20,13 @@ public class SpringAppApplication implements CommandLineRunner {
 	и где он является получателем
 	 */
 
-	private static final Logger logger = LoggerFactory.getLogger(SpringAppApplication.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SpringAppApplication.class.getName());
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpringAppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SpringAppApplication.class, args);
+    }
 
-	@Override
-	public void run(String... args) throws Exception {
-	}
+    @Override
+    public void run(String... args) throws Exception {
+    }
 }

@@ -1,19 +1,28 @@
 package ru.otus.java.pro.spring.app.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@Table(name = "transfers")
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
+@ToString
+@Table(name = "transfers")
 public class Transfer {
     @Id
     @Column(name = "id")
     private String id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "client_id", updatable = false, insertable = false)
+    private Client client;
 
     @Column(name = "client_id")
     private String clientId;

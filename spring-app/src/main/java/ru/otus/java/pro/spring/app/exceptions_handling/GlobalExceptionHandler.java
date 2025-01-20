@@ -2,6 +2,7 @@ package ru.otus.java.pro.spring.app.exceptions_handling;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -24,5 +25,10 @@ public class GlobalExceptionHandler {
                 ),
                 HttpStatus.UNPROCESSABLE_ENTITY
         );
+    }
+
+    @ExceptionHandler(value = BusinessLogicException.class)
+    public ResponseEntity<ErrorDto> catchBusinessLogicException(BusinessLogicException e) {
+        return new ResponseEntity<>(new ErrorDto(e.getCode(), e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
