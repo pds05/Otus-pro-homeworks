@@ -65,9 +65,7 @@ public class TransfersService {
                 .build();
         transfersRepository.save(transfer);
         sourceAccount.setFunds(sourceAccount.getFunds().subtract(amount));
-        accountsService.saveAccount(sourceAccount);
         targetAccount.setFunds(targetAccount.getFunds().add(amount));
-        accountsService.saveAccount(targetAccount);
         log.debug("Create transfer: {}", transfer);
         return transfer;
     }
