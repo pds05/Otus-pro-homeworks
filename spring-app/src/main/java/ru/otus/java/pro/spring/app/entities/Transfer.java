@@ -41,4 +41,11 @@ public class Transfer {
 
     @Column(name = "amount")
     private int amount;
+
+    @Transient
+    private Direction direction;
+
+    public enum Direction {
+        IN, OUT, INNER
+    }
 }

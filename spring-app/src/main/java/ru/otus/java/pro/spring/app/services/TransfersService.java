@@ -26,11 +26,15 @@ public class TransfersService {
     private final AccountsService accountsService;
 
     public Optional<Transfer> getTransferById(String id, String clientId) {
-        return transfersRepository.findByIdAndClientId(id, clientId);
+        Optional<Transfer> transfer = transfersRepository.findByIdAndClientId(id, clientId);
+        transfer.ifPresent(t -> defineTransferDirection(clientId, t));
+        return transfer;
     }
 
     public List<Transfer> getAllTransfers(String clientId) {
-        return transfersRepository.findAllByClientId(clientId);
+        List<Transfer> transfers = transfersRepository.findAllByClientId(clientId);
+        transfers.forEach(t -> defineTransferDirection(clientId, t));
+        return transfers;
     }
 
     @Transactional
@@ -62,6 +66,8 @@ public class TransfersService {
                 .targetAccount(targetAccount.getAccount())
                 .message(executeTransferDtoRq.message())
                 .amount(executeTransferDtoRq.amount())
+                .direction(clientId.equals(targetAccount.getClient().getId()) ?
+                        Transfer.Direction.INNER : Transfer.Direction.OUT)
                 .build();
         transfersRepository.save(transfer);
         sourceAccount.setFunds(sourceAccount.getFunds().subtract(amount));
@@ -101,6 +107,16 @@ public class TransfersService {
         }
         if (!errors.isEmpty()) {
             throw new ValidationException("EXECUTE_TRANSFER_VALIDATION_ERROR", "Проблемы заполнения полей перевода", errors);
+        }
+    }
+
+    private void defineTransferDirection(String clientId, Transfer transfer) {
+        if (transfer.getClientId().equals(transfer.getTargetClientId())) {
+            transfer.setDirection(Transfer.Direction.INNER);
+        } else if (transfer.getClientId().equals(clientId)) {
+            transfer.setDirection(Transfer.Direction.OUT);
+        } else {
+            transfer.setDirection(Transfer.Direction.IN);
         }
     }
 }

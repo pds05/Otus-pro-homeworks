@@ -1,7 +1,6 @@
 package ru.otus.java.pro.spring.app.controllers;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.java.pro.spring.app.dtos.AccountDto;
 import ru.otus.java.pro.spring.app.entities.Account;
