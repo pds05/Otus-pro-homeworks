@@ -3,8 +3,12 @@ package ru.otus.java.pro.homeworks.hibernate.services;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.java.pro.homeworks.hibernate.config.SessionFactoryConfigurator;
 import ru.otus.java.pro.homeworks.hibernate.daos.OrderDao;
 import ru.otus.java.pro.homeworks.hibernate.daos.ProductDao;
 import ru.otus.java.pro.homeworks.hibernate.dtos.Basket;
@@ -91,40 +95,54 @@ public class StoreService {
             throw new ApplicationException("Basket is empty");
         }
         Basket basket = USER_BASKETS.get(userId);
-        User user = new User();
-        user.setId(userId);
+        Transaction transaction = getSession().beginTransaction();
+        try {
+            User user = new User();
+            user.setId(userId);
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setOrderDatetime(LocalDateTime.now());
-        order.setTotalAmount(BigDecimal.ZERO);
+            Order order = new Order();
+            order.setUser(user);
+            order.setOrderDatetime(LocalDateTime.now());
+            order.setTotalAmount(BigDecimal.ZERO);
 
-        basket.getProducts().forEach((productId, quantity) -> {
-            Product product = productDao.findById(productId).orElseThrow(() -> new ApplicationException("Product {} from basket not found"));
-            if (product.getQuantity() == 0 || product.getQuantity() < quantity) {
-                logger.warn("Not enough product {}, current quantity {}, required quantity {}",
-                        product.getTitle(),
-                        product.getQuantity(),
-                        quantity);
-                return;
-            }
-            OrdersProduct ordersProduct = new OrdersProduct();
-            ordersProduct.setOrder(order);
-            ordersProduct.setProduct(product);
-            ordersProduct.setQuantity(quantity);
-            ordersProduct.setOrderPrice(product.getActualPrice());
-            ordersProduct.setPriceType(product.getPriceType());
-            ordersProduct.setPromotionId(product.getPromotionId());
+            basket.getProducts().forEach((productId, quantity) -> {
+                Product product = productDao.findById(productId).orElseThrow(() -> new ApplicationException("Product {} from basket not found"));
+                if (product.getQuantity() == 0 || product.getQuantity() < quantity) {
+                    logger.warn("Not enough product {}, current quantity {}, required quantity {}",
+                            product.getTitle(),
+                            product.getQuantity(),
+                            quantity);
+                    return;
+                }
+                OrdersProduct ordersProduct = new OrdersProduct();
+                ordersProduct.setOrder(order);
+                ordersProduct.setProduct(product);
+                ordersProduct.setQuantity(quantity);
+                ordersProduct.setOrderPrice(product.getActualPrice());
+                ordersProduct.setPriceType(product.getPriceType());
+                ordersProduct.setPromotionId(product.getPromotionId());
 
-            order.addOrdersProduct(ordersProduct);
-            order.setTotalAmount(order.getTotalAmount()
-                    .add(product.getActualPrice().multiply(BigDecimal.valueOf(quantity))));
+                order.addOrdersProduct(ordersProduct);
+                order.setTotalAmount(order.getTotalAmount()
+                        .add(product.getActualPrice().multiply(BigDecimal.valueOf(quantity))));
 
-            product.setQuantity(product.getQuantity() - quantity);
-            productDao.update(product);
-        });
-        Order createdOrder = orderDao.update(order);
-        logger.info("New order received {}", createdOrder);
-        USER_BASKETS.remove(userId);
+                product.setQuantity(product.getQuantity() - quantity);
+                productDao.update(product);
+            });
+            Order createdOrder = orderDao.update(order);
+            transaction.commit();
+
+            logger.info("New order received {}", createdOrder);
+            USER_BASKETS.remove(userId);
+        } catch (Exception e) {
+            transaction.rollback();
+            logger.error("Failed to create order, userId={}", userId, e);
+            throw new ApplicationException("Failed to create order, cause={}" + e.getMessage());
+        }
+    }
+
+    private Session getSession() {
+        SessionFactory sessionFactory = SessionFactoryConfigurator.configInstance();
+        return sessionFactory.getCurrentSession();
     }
 }

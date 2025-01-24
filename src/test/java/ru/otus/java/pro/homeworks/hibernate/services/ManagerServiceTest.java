@@ -148,6 +148,8 @@ public class ManagerServiceTest {
 
     @AfterAll
     public static void close() {
+        System.out.println("Opened sessions = " + sessionFactory.getStatistics().getSessionOpenCount());
+        System.out.println("Closed sessions = " + sessionFactory.getStatistics().getSessionCloseCount());
         sessionFactory.close();
     }
 }

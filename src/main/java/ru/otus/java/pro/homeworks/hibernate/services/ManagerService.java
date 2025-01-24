@@ -3,8 +3,12 @@ package ru.otus.java.pro.homeworks.hibernate.services;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.java.pro.homeworks.hibernate.config.SessionFactoryConfigurator;
 import ru.otus.java.pro.homeworks.hibernate.daos.ProductDao;
 import ru.otus.java.pro.homeworks.hibernate.daos.PromotionDao;
 import ru.otus.java.pro.homeworks.hibernate.daos.UserDao;
@@ -51,10 +55,10 @@ public class ManagerService {
                         .orElseThrow(() -> new ApplicationException("Promotion id " + productDto.getPromotionId() + " not found"));
                 promotion.addProduct(product);
                 promotionDao.update(promotion);
-                long productId = product.getId();
-                product = productDao.findById(product.getId()).orElseThrow(() -> new ApplicationException("Product id " + productId + " not found after saving"));
             }
         }
+        //reload product for calculating actual price
+        product = productDao.findById(product.getId()).orElseThrow(() -> new ApplicationException("Error product loading by id"));
         logger.info("Added product {}", product);
         return EntityDtoMapper.map(product);
     }
@@ -130,26 +134,47 @@ public class ManagerService {
 
     public void addProductsToPromotion(List<Long> productIds, long promotionId) {
         Promotion promotion = promotionDao.findById(promotionId).orElseThrow(() -> new ApplicationException("Promotion not found"));
-        productIds.forEach(productId -> {
-            Product product = productDao.findById(productId).orElseThrow(() -> new ApplicationException("Product " + productId + " not found"));
-            promotion.getProducts().add(product);
-        });
-        promotionDao.update(promotion);
-        logger.info("Added products {} to promotion, updated promotion {}", productIds, promotion);
+        Transaction transaction = getSession().beginTransaction();
+        try {
+            productIds.forEach(productId -> {
+                Product product = productDao.findById(productId).orElseThrow(() -> new ApplicationException("Product " + productId + " not found"));
+                promotion.getProducts().add(product);
+            });
+            promotionDao.update(promotion);
+            transaction.commit();
+            logger.info("Added products {} to promotion, updated promotion {}", productIds, promotion);
+        } catch (Exception e) {
+            transaction.rollback();
+            logger.error("Failed to add products to promotionId={}, productIds={}", productIds, productIds, e);
+            throw new ApplicationException("Failed to add products to promotion, cause=" + e.getMessage());
+        }
     }
 
     public void removeProductsFromPromotion(List<Long> productIds, long promotionId) {
         Promotion promotion = promotionDao.findById(promotionId).orElseThrow(() -> new ApplicationException("Promotion not found"));
-        productIds.forEach(productId -> {
-            Product product = productDao.findById(productId).orElseThrow(() -> new ApplicationException("Product " + productId + " not found"));
-            promotion.removeProduct(product);
-        });
-        promotionDao.update(promotion);
-        logger.info("Removed products {} from promotion, updated promotion {}", productIds, promotion);
+        Transaction transaction = getSession().beginTransaction();
+        try {
+            productIds.forEach(productId -> {
+                Product product = productDao.findById(productId).orElseThrow(() -> new ApplicationException("Product " + productId + " not found"));
+                promotion.removeProduct(product);
+            });
+            promotionDao.update(promotion);
+            transaction.commit();
+            logger.info("Removed products {} from promotion, updated promotion {}", productIds, promotion);
+        } catch (Exception e) {
+            transaction.rollback();
+            logger.error("Failed to remove products from promotion, promotionId={}, productIds={}", promotionId, productIds, e);
+            throw new ApplicationException("Failed to remove products from promotion, cause=" + e.getMessage());
+        }
     }
 
     public List<UserProfileDto> findUsersByProduct(long productId) {
         List<User> users = userDao.findByOrdersProductId(productId);
         return users.stream().map(EntityDtoMapper::map).toList();
+    }
+
+    private Session getSession() {
+        SessionFactory sessionFactory = SessionFactoryConfigurator.configInstance();
+        return sessionFactory.getCurrentSession();
     }
 }

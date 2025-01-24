@@ -25,9 +25,9 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> findById(long id) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         User user = session.find(User.class, id);
-        session.getTransaction().commit();
+        transaction.commit();
         return Optional.ofNullable(user);
     }
 
@@ -35,24 +35,24 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> findByCredentials(String username, String password) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         Query<User> namedQuery = session.createNamedQuery("User.findByUsernameAndPassword", User.class)
                 .setParameter("username", username)
                 .setParameter("password", password);
         Optional<User> user = namedQuery.uniqueResultOptional();
-        session.getTransaction().commit();
+        transaction.commit();
         return user;
     }
 
     @Override
     public Optional<User> findByIdWithData(long id) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         RootGraph<User> graph = session.createEntityGraph(User.class, "User.orders");
         Optional<User> user = session.byId(User.class)
                 .withFetchGraph(graph)
                 .loadOptional(id);
-        session.getTransaction().commit();
+        transaction.commit();
         return user;
     }
 
@@ -61,7 +61,7 @@ public class UserDaoImpl implements UserDao {
     public Optional<User> findByContacts(String phoneNumber, String email) {
         Optional<User> result;
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         Query<User> namedQuery = session.createNamedQuery("User.findByPhoneNumberOrEmail", User.class)
                 .setParameter(1, phoneNumber)
                 .setParameter(2, email);
@@ -70,29 +70,29 @@ public class UserDaoImpl implements UserDao {
         } catch (NoResultException e) {
             result = Optional.empty();
         }
-        session.getTransaction().commit();
+        transaction.commit();
         return result;
     }
 
     @Override
     public List<User> findAll() {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         List<User> users = session.createQuery("from User", User.class).list();
-        session.getTransaction().commit();
+        transaction.commit();
         return users;
     }
 
     @Override
     public User save(User user) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             session.persist(user);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Saved user {} ", user);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to save user {}", user, e);
             throw new ApplicationException("Failed to save user");
         }
@@ -102,14 +102,14 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User update(User user) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             User mergedUser = session.merge(user);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Updated user {}", mergedUser);
             return mergedUser;
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to update user {}", user, e);
             throw new ApplicationException("Failed to update user");
         }
@@ -118,15 +118,15 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void delete(long userId) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             MutationQuery query = session.createMutationQuery("delete from User where id = :id");
             query.setParameter("id", userId);
             query.executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Deleted user id={}", userId);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to delete userId={}", userId, e);
             throw new ApplicationException("Failed to delete user");
         }
@@ -134,11 +134,11 @@ public class UserDaoImpl implements UserDao {
 
     public List<User> findByOrdersProductId(long productId) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         List<User> users = session.createNamedQuery("User.findByProductId", User.class)
                 .setParameter("productId", productId)
                 .list();
-        session.getTransaction().commit();
+        transaction.commit();
         return users;
     }
 }

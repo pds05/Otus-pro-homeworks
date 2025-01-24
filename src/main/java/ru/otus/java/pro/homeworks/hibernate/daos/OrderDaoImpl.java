@@ -27,49 +27,49 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public Optional<Order> findById(long id) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         EntityGraph<?> graph = session.createEntityGraph("Order.ordersProducts");
         Optional<Order> order = session.createQuery("from Order where id = :id", Order.class)
                 .setParameter("id", id)
                 .setHint("jakarta.persistence.fetchgraph", graph)
                 .uniqueResultOptional();
-        session.getTransaction().commit();
+        transaction.commit();
         return order;
     }
 
     @Override
     public List<Order> findAll() {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         List<Order> orders = session.createNamedQuery("Order.findAllWithData", Order.class)
                 .getResultList();
-        session.getTransaction().commit();
+        transaction.commit();
         return orders;
     }
 
     @Override
     public List<Order> findAllByUserId(long userId) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         RootGraph<Order> graph = session.createEntityGraph(Order.class, "Order.ordersProducts");
         List<Order> orders = session.createNamedQuery("Order.findByUserId", Order.class)
                 .setParameter("userId", userId)
                 .applyFetchGraph(graph)
                 .list();
-        session.getTransaction().commit();
+        transaction.commit();
         return orders;
     }
 
     @Override
     public Order save(Order order) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             session.persist(order);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Saved order {}", order);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to save order {}", order, e);
             throw new ApplicationException("Failed to save order");
         }
@@ -79,14 +79,14 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public Order update(Order order) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             Order mergedOrder = session.merge(order);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Updated order {}", mergedOrder);
             return mergedOrder;
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to update order {}", order, e);
             throw new ApplicationException("Failed to update order");
         }
@@ -95,15 +95,15 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public void delete(long orderId) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             MutationQuery query = session.createMutationQuery("delete from Order where id = :id");
             query.setParameter("id", orderId);
             query.executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Deleted order id={}", orderId);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to delete order id={}", orderId, e);
             throw new ApplicationException("Failed to delete order");
         }

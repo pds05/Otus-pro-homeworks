@@ -37,7 +37,7 @@ public class StoreServiceTest {
         List<ProductDto> products = storeService.viewAllProducts();
         System.out.println(products);
         assertNotNull(products);
-        assertTrue(!products.isEmpty());
+        assertFalse(products.isEmpty());
     }
 
     @Test
@@ -136,6 +136,8 @@ public class StoreServiceTest {
 
     @AfterAll
     public static void close() {
+        System.out.println("Opened sessions = " + sessionFactory.getStatistics().getSessionOpenCount());
+        System.out.println("Closed sessions = " + sessionFactory.getStatistics().getSessionCloseCount());
         sessionFactory.close();
     }
 }

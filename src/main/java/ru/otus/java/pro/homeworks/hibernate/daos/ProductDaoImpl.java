@@ -29,81 +29,81 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public Optional<Product> findById(long id) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         EntityGraph<?> graph = session.createEntityGraph("Product.promotions");
         Optional<Product> product = session.createQuery("from Product where id = :id", Product.class)
                 .setParameter("id", id)
                 .setHint("jakarta.persistence.fetchgraph", graph)
                 .uniqueResultOptional();
-        session.getTransaction().commit();
+        transaction.commit();
         return product;
     }
 
     @Override
     public List<Product> findByProductType(String productType) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         RootGraph<Product> graph = session.createEntityGraph(Product.class, "Product.promotions");
         List<Product> products = session.createNamedQuery("Product.findByProductTypeTitle", Product.class)
                 .setParameter("title", productType)
                 .applyFetchGraph(graph)
                 .list();
-        session.getTransaction().commit();
+        transaction.commit();
         return products;
     }
 
     @Override
     public Optional<Product> findByTitle(String title) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         Optional<Product> product = session.createNamedQuery("Product.findByTitleWithData", Product.class)
                 .setParameter("title", "%" + title + "%")
                 .uniqueResultOptional();
-        session.getTransaction().commit();
+        transaction.commit();
         return product;
     }
 
     @Override
     public List<ProductType> findProductTypes() {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         List<ProductType> productTypes = session.createQuery("from ProductType", ProductType.class)
                 .list();
-        session.getTransaction().commit();
+        transaction.commit();
         return productTypes;
     }
 
     @Override
     public Optional<ProductType> findProductTypeByTitle(String title) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         Optional<ProductType> productType = session.createNamedQuery("ProductType.findByTitleWithData", ProductType.class)
                 .setParameter("title", title)
                 .uniqueResultOptional();
-        session.getTransaction().commit();
+        transaction.commit();
         return productType;
     }
 
     @Override
     public List<Product> findAll() {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         List<Product> products = session.createNamedQuery("Product.findAllWithData", Product.class)
                 .getResultList();
-        session.getTransaction().commit();
+        transaction.commit();
         return products;
     }
 
     @Override
     public Product save(Product product) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             session.persist(product);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Saved product {}", product);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to save product {}", product, e);
             throw new ApplicationException("Failed to save product");
         }
@@ -113,14 +113,14 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public Product update(Product product) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             Product mergedProduct = session.merge(product);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Updated product {}", mergedProduct);
             return mergedProduct;
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to update product {}", product, e);
             throw new ApplicationException("Failed to update product");
         }
@@ -129,15 +129,15 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public void delete(long productId) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             MutationQuery query = session.createMutationQuery("delete from Product where id = :id");
             query.setParameter("id", productId);
             query.executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Deleted product id={}", productId);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to delete product id={}", productId, e);
             throw new ApplicationException("Failed to delete product");
         }

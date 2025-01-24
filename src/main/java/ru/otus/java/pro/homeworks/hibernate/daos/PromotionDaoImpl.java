@@ -30,38 +30,37 @@ public class PromotionDaoImpl implements PromotionDao {
     @Override
     public Optional<Promotion> findById(long id) {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         EntityGraph<?> graph = session.createEntityGraph("Promotion.products");
         Map<String, Object> properties = new HashMap<>();
         properties.put("javax.persistence.fetchgraph", graph);
         Promotion promotion = session.find(Promotion.class, id, properties);
-        session.getTransaction().commit();
+        transaction.commit();
         return Optional.ofNullable(promotion);
     }
 
     @Override
     public List<Promotion> findAll() {
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
+        DaoTransaction transaction = getTransaction(session);
         RootGraph<Promotion> graph = session.createEntityGraph(Promotion.class, "Promotion.products");
         List<Promotion> promotions = session.createQuery("from Promotion", Promotion.class)
                 .applyFetchGraph(graph)
                 .list();
-        session.getTransaction().commit();
+        transaction.commit();
         return promotions;
     }
 
     @Override
     public Promotion save(Promotion promotion) {
         Session session = sessionFactory.getCurrentSession();
-        Promotion savedPromotion;
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             session.persist(promotion);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Saved promotion {}", promotion);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to save promotion {}", promotion, e);
             throw new ApplicationException("Failed to save promotion");
         }
@@ -71,14 +70,14 @@ public class PromotionDaoImpl implements PromotionDao {
     @Override
     public Promotion update(Promotion promotion) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             Promotion mergedPromotion = session.merge(promotion);
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Updated promotion {}", mergedPromotion);
             return mergedPromotion;
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to save promotion {}", promotion, e);
             throw new ApplicationException("Failed to save promotion");
         }
@@ -87,15 +86,15 @@ public class PromotionDaoImpl implements PromotionDao {
     @Override
     public void delete(long promotionId) {
         Session session = sessionFactory.getCurrentSession();
+        DaoTransaction transaction = getTransaction(session);
         try {
-            session.beginTransaction();
             MutationQuery query = session.createMutationQuery("delete from Promotion where id = :id");
             query.setParameter("id", promotionId);
             query.executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
             logger.debug("Deleted promotion id={}", promotionId);
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            transaction.rollback();
             logger.error("Failed to delete promotion {}", promotionId, e);
             throw new ApplicationException("Failed to delete promotion");
         }
