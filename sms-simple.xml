@@ -1,0 +1,76 @@
+<chat_sessions>
+  <chat_session>
+    <chat_identifier>Apple</chat_identifier>
+    <members>
+      <member>
+        <last>Saint-Petersburg</last>
+      </member>
+      <member>
+        <last>Kaliningrad</last>
+      </member>
+    </members>
+    <messages>
+      <message_group>
+        <message>
+          <belong_number>79219213267</belong_number>
+          <send_date>03-31-2023 15:53:28</send_date>
+          <text>PROBLEM WARNING - It's raining like dogs and cats</text>
+        </message>
+        <message>
+          <belong_number>79219213267</belong_number>
+          <send_date>03-31-2023 14:09:19</send_date>
+          <text>PROBLEM CRITICAL - There is hight price of the order</text>
+        </message>
+      </message_group>
+      <message_group>
+        <message>
+          <belong_number>79215553267</belong_number>
+          <send_date>03-31-2023 15:09:15</send_date>
+          <text>PROBLEM CRITICAL - The weather is not good for today</text>
+        </message>
+        <message>
+          <belong_number>79215553267</belong_number>
+          <send_date>03-31-2023 14:53:34</send_date>
+          <text>PROBLEM WARNING - No more free space on the disc</text>
+        </message>
+      </message_group>
+    </messages>
+  </chat_session>
+  <chat_session>
+    <chat_identifier>Android</chat_identifier>
+    <members>
+      <member>
+        <last>Kazan</last>
+      </member>
+      <member>
+        <last>Penza</last>
+      </member>
+    </members>
+    <messages>
+      <message_group>
+        <message>
+          <belong_number>79219213267</belong_number>
+          <send_date>03-31-2023 15:53:28</send_date>
+          <text>PROBLEM WARNING - It's raining like dogs and cats</text>
+        </message>
+        <message>
+          <belong_number>79219213267</belong_number>
+          <send_date>03-31-2023 14:09:19</send_date>
+          <text>PROBLEM CRITICAL - There is hight price of the order</text>
+        </message>
+      </message_group>
+      <message_group>
+        <message>
+          <belong_number>79215553267</belong_number>
+          <send_date>03-31-2023 15:09:15</send_date>
+          <text>PROBLEM CRITICAL - The weather is not good for today</text>
+        </message>
+        <message>
+          <belong_number>79215553267</belong_number>
+          <send_date>03-31-2023 14:53:34</send_date>
+          <text>PROBLEM WARNING - No more free space on the disc</text>
+        </message>
+      </message_group>
+    </messages>
+  </chat_session>
+</chat_sessions>

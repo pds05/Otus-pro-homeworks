@@ -1,0 +1,59 @@
+{
+  "chat_sessions" : [ {
+    "chat_identifier" : "Apple",
+    "members" : [ {
+      "last" : "Saint-Petersburg"
+    }, {
+      "last" : "Kaliningrad"
+    } ],
+    "messages" : [ {
+      "message" : [ {
+        "belong_number" : "79219213267",
+        "send_date" : "03-31-2023 15:53:28",
+        "text" : "PROBLEM WARNING - It's raining like dogs and cats"
+      }, {
+        "belong_number" : "79219213267",
+        "send_date" : "03-31-2023 14:09:19",
+        "text" : "PROBLEM CRITICAL - There is hight price of the order"
+      } ]
+    }, {
+      "message" : [ {
+        "belong_number" : "79215553267",
+        "send_date" : "03-31-2023 15:09:15",
+        "text" : "PROBLEM CRITICAL - The weather is not good for today"
+      }, {
+        "belong_number" : "79215553267",
+        "send_date" : "03-31-2023 14:53:34",
+        "text" : "PROBLEM WARNING - No more free space on the disc"
+      } ]
+    } ]
+  }, {
+    "chat_identifier" : "Android",
+    "members" : [ {
+      "last" : "Kazan"
+    }, {
+      "last" : "Penza"
+    } ],
+    "messages" : [ {
+      "message" : [ {
+        "belong_number" : "79219213267",
+        "send_date" : "03-31-2023 15:53:28",
+        "text" : "PROBLEM WARNING - It's raining like dogs and cats"
+      }, {
+        "belong_number" : "79219213267",
+        "send_date" : "03-31-2023 14:09:19",
+        "text" : "PROBLEM CRITICAL - There is hight price of the order"
+      } ]
+    }, {
+      "message" : [ {
+        "belong_number" : "79215553267",
+        "send_date" : "03-31-2023 15:09:15",
+        "text" : "PROBLEM CRITICAL - The weather is not good for today"
+      }, {
+        "belong_number" : "79215553267",
+        "send_date" : "03-31-2023 14:53:34",
+        "text" : "PROBLEM WARNING - No more free space on the disc"
+      } ]
+    } ]
+  } ]
+}

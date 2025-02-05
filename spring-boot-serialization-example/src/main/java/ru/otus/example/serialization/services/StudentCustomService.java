@@ -16,7 +16,7 @@ public class StudentCustomService {
     private final StudentService studentService;
     private final ObjectMapper objectMapper;
 
-    @Scheduled(initialDelay = 5000, fixedDelay = 5000)
+//    @Scheduled(initialDelay = 5000, fixedDelay = 5000)
     public void customFieldSerialization() throws JsonProcessingException {
         StudentDto student = studentService.findOneById(1)
                                            .map(Student::toDto)
