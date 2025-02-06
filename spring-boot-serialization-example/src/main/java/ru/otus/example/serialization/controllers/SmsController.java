@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.example.serialization.config.io.JsonConverter;
+import ru.otus.example.serialization.config.io.Transmittable;
 import ru.otus.example.serialization.config.io.XmlConverter;
 import ru.otus.example.serialization.dto.ChatSessionDto;
 import ru.otus.example.serialization.entitites.ChatSession;
@@ -56,6 +57,7 @@ public class SmsController {
     public ResponseEntity<ChatSessionDto> getChatSessions(
             @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType) {
         ChatSessionDto deserializedDto = null;
+        Transmittable converter;
         List<ChatSession> chatSessions = service.findAll();
         log.debug("Deserialized source json to list: {}", chatSessions);
         ChatSessionDto dto = CHAT_SESSION_TO_DTO.apply(chatSessions);
@@ -63,16 +65,16 @@ public class SmsController {
         HttpHeaders headers = new HttpHeaders();
         switch (contentType) {
             case MediaType.APPLICATION_JSON_VALUE: {
-                JsonConverter jsonConverter = new JsonConverter();
-                jsonConverter.send(dto);
-                deserializedDto = jsonConverter.pull(ChatSessionDto.class);
+                converter = new JsonConverter();
+                converter.send(dto);
+                deserializedDto = converter.pull(ChatSessionDto.class);
                 headers.setContentType(MediaType.APPLICATION_JSON);
             }
             break;
             case MediaType.APPLICATION_XML_VALUE: {
-                XmlConverter xmlConverter = new XmlConverter();
-                xmlConverter.send(dto);
-                deserializedDto = xmlConverter.pull(ChatSessionDto.class);
+                converter = new XmlConverter();
+                converter.send(dto);
+                deserializedDto = converter.pull(ChatSessionDto.class);
                 headers.setContentType(MediaType.APPLICATION_XML);
             }
             break;
