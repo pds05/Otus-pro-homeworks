@@ -11,13 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.otus.example.serialization.config.exception.SmsException;
+import ru.otus.example.serialization.config.io.JsonConverter;
+import ru.otus.example.serialization.config.io.XmlConverter;
 import ru.otus.example.serialization.dto.ChatSessionDto;
 import ru.otus.example.serialization.entitites.ChatSession;
 import ru.otus.example.serialization.services.ChatSessionService;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -27,13 +26,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 public class SmsController {
-    private final ObjectMapper objectMapper;
-    private final XmlMapper xmlMapper;
-    @Value("${sms.file-export.json}")
-    private String fileExportJson;
-    @Value("${sms.file-export.xml}")
-    private String fileExportXml;
-
     private static final Function<List<ChatSession>, ChatSessionDto> CHAT_SESSION_TO_DTO =
             list -> new ChatSessionDto(list.stream()
                     .map(chatSession ->
@@ -69,29 +61,21 @@ public class SmsController {
         ChatSessionDto dto = CHAT_SESSION_TO_DTO.apply(chatSessions);
         log.debug("Convert source to simple DTO: {}", dto);
         HttpHeaders headers = new HttpHeaders();
-        try {
-            switch (contentType) {
-                case MediaType.APPLICATION_JSON_VALUE: {
-                    objectMapper.writeValue(new File(fileExportJson), dto);
-                    log.debug("Serialization dto to file {} completed", fileExportJson);
-                    deserializedDto = objectMapper.readValue(new File(fileExportJson), ChatSessionDto.class);
-                    log.debug("Deserialized from {} to object: {}", fileExportJson, deserializedDto);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                }
-                break;
-                case MediaType.APPLICATION_XML_VALUE: {
-                    xmlMapper.writeValue(new File(fileExportXml), dto);
-                    log.debug("Serialization dto to file {} completed", fileExportXml);
-                    deserializedDto = xmlMapper.readValue(new File(fileExportXml), ChatSessionDto.class);
-                    log.debug("Deserialized from {} to object: {}", fileExportXml, deserializedDto);
-                    headers.setContentType(MediaType.APPLICATION_XML);
-                }
-                break;
+        switch (contentType) {
+            case MediaType.APPLICATION_JSON_VALUE: {
+                JsonConverter jsonConverter = new JsonConverter();
+                jsonConverter.send(dto);
+                deserializedDto = jsonConverter.pull(ChatSessionDto.class);
+                headers.setContentType(MediaType.APPLICATION_JSON);
             }
-
-        } catch (IOException e) {
-            log.error("Failed read/write file {}", contentType.equals(MediaType.APPLICATION_JSON_VALUE) ? fileExportJson : fileExportXml, e);
-            throw new SmsException("EXPORT_FILE_ACCESS", "Ошибка доступа к файлу для экспорта");
+            break;
+            case MediaType.APPLICATION_XML_VALUE: {
+                XmlConverter xmlConverter = new XmlConverter();
+                xmlConverter.send(dto);
+                deserializedDto = xmlConverter.pull(ChatSessionDto.class);
+                headers.setContentType(MediaType.APPLICATION_XML);
+            }
+            break;
         }
         log.debug("Source dto object equals deserialized object = {}", deserializedDto.equals(dto));
         return new ResponseEntity<>(dto, headers, HttpStatus.OK);
