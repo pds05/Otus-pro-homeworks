@@ -1,4 +1,4 @@
-package ru.otus.example.serialization.config.io;
+package ru.otus.example.serialization.io;
 
 public interface Transmittable {
 

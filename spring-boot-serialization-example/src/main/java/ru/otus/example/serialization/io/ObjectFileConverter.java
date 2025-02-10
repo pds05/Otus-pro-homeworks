@@ -1,4 +1,4 @@
-package ru.otus.example.serialization.config.io;
+package ru.otus.example.serialization.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;

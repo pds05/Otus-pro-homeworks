@@ -1,4 +1,4 @@
-package ru.otus.example.serialization.config.io;
+package ru.otus.example.serialization.io;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.beans.factory.annotation.Autowired;
