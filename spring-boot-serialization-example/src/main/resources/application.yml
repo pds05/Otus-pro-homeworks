@@ -1,0 +1,26 @@
+sms:
+  file-import: "sms-256866-434ec1.json"
+  file-export:
+    json: "sms-simple.json"
+    xml: "sms-simple.xml"
+spring:
+  jackson:
+#    deserialization:
+#      unwrap-single-value-arrays: true
+#      unwrap-root-value: true
+# https://www.baeldung.com/spring-boot-customize-jackson-objectmapper
+# https://codingnconcepts.com/spring-boot/customize-jackson-json-mapper/
+# spring.jackson.<category_name>.<feature_name>=true,false
+#    default-property-inclusion: non_null
+#    default-property-inclusion: non_empty
+#    serialization:
+#      wrap-root-value: true
+#      write-dates-as-timestamps: true
+# https://docs.spring.io/spring-boot/docs/2.1.13.RELEASE/reference/html/boot-features-json.html
+#  mvc:
+#    converters:
+#      preferred-json-mapper: gson
+#      preferred-json-mapper: jackson
+logging:
+  level:
+    ru.otus : debug
