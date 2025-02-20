@@ -18,12 +18,13 @@ public class ProducerApplication {
 
     private final ActiveMqProducer activeMqProducer;
     private final Random random = new Random();
+    private int counter;
 
     @Scheduled(fixedRate = 2000)
     public void sendMessage() {
         MessageDto message = new MessageDto();
         message.setUuid(UUID.randomUUID());
-        message.setText("Message number: " + random.nextInt(10));
+        message.setText("Message number: " + ++counter);
         activeMqProducer.sendMessage(message,
                 ActiveMqProducer.MessageType.getMessageType(random.nextInt(3)));
     }
