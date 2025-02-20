@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: consumer
+  activemq:
+    broker-url: 'tcp://localhost:61616'
+    user: user
+    password: rmohr
+  jms:
+    template:
+      default-destination: message.queuemessage.queue
