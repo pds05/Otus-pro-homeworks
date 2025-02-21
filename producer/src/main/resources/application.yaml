@@ -1,0 +1,19 @@
+server:
+  port: 8189
+spring:
+  application:
+    name: producer
+  activemq:
+    broker-url: 'tcp://localhost:61616'
+    user: user
+    password: rmohr
+  jms:
+    template:
+      default-destination: 'message.queue'
+scheduler:
+  enable-send-message: true
+logging:
+  level:
+    org.apache.activemq: INFO
+    ru.otus: DEBUG
+
