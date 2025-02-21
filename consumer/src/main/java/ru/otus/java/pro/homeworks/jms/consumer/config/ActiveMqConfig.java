@@ -26,7 +26,6 @@ public class ActiveMqConfig {
     public static final String LISTENER_FACTORY = "activeMqListenerFactory";
     public static final String CONNECTION_FACTORY = "activeMqConnectionFactory";
     public static final String MESSAGE_CONVERTER = "messageConverter";
-    public static final String DESTINATION_QUEUE = "message.queue";
     public static final String CLASS_NAME = "className";
 
     @Value("${spring.activemq.broker-url}")

@@ -25,7 +25,7 @@ public class ActiveMqListener {
     }
 
     @SneakyThrows
-    @JmsListener(destination = ActiveMqConfig.DESTINATION_QUEUE,
+    @JmsListener(destination = "${spring.jms.template.default-destination}",
             containerFactory = ActiveMqConfig.LISTENER_FACTORY
     )
     public void onMessage(Message message) {
@@ -40,7 +40,7 @@ public class ActiveMqListener {
             } else {
                 throw new IllegalArgumentException("Message type not supported: " + message.getClass().getName());
             }
-            log.info("Message received from broker: {}", receivedObject);
+            log.debug("Message received from broker: {}", receivedObject);
         } catch (Exception e) {
             log.error("Error deserializing message {}", message, e);
         }

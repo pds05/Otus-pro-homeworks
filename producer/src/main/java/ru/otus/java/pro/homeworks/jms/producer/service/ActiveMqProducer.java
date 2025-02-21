@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Service;
+import ru.otus.java.pro.homeworks.jms.dto.MessageDto;
 import ru.otus.java.pro.homeworks.jms.producer.config.ActiveMqConfig;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,9 +32,26 @@ public class ActiveMqProducer {
             case TEXT_MESSAGE -> jmsTemplate.send(createTextMessageCreator(message));
             case OBJECT_MESSAGE -> jmsTemplate.send(createObjectMessageCreator(message));
             default -> jmsTemplate.convertAndSend(message);
-
         }
-        log.info("Message sent to broker: {}", message);
+        log.debug("Message sent to broker: '{}', messageType={}", message, messageType);
+    }
+
+    public void sendMessage(Object message) {
+        sendMessage(message, MessageType.DEFAULT);
+    }
+
+    public void sendMessage(String message) {
+        MessageDto messageDto = new MessageDto();
+        messageDto.setText(message);
+        messageDto.setUuid(UUID.randomUUID());
+        sendMessage(message, MessageType.DEFAULT);
+    }
+
+    public void sendMessage(String message, MessageType messageType) {
+        MessageDto messageDto = new MessageDto();
+        messageDto.setText(message);
+        messageDto.setUuid(UUID.randomUUID());
+        sendMessage(messageDto, messageType);
     }
 
     private MessageCreator createTextMessageCreator(Object message) {

@@ -1,3 +1,5 @@
+server:
+  port: 8189
 spring:
   application:
     name: producer
@@ -8,7 +10,10 @@ spring:
   jms:
     template:
       default-destination: 'message.queue'
+scheduler:
+  enable-send-message: true
 logging:
   level:
-    org.apache.activemq: DEBUG
+    org.apache.activemq: INFO
+    ru.otus: DEBUG
 
