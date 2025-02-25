@@ -1,0 +1,7 @@
+docker build . -t postgres_custom_ru
+
+http://localhost:8189/swagger-ui/index.html
+
+https://editor.swagger.io/
+
+-Dspring.profiles.active=dev
