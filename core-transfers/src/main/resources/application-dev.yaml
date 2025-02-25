@@ -12,6 +12,20 @@ spring:
   jpa:
     show-sql: true
     open-in-view: false
+  kafka:
+    producer:
+      bootstrap-servers: 127.0.0.1:9092
+      properties:
+        allow.auto.create.topics: false
+        spring:
+          json:
+            add:
+              type:
+                headers: false
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      topics:
+        transfer-topic: mt.transfers.status.info
 management:
   endpoints:
     web:
@@ -22,3 +36,6 @@ integrations:
     url: http://localhost:8182/api/v1/limits
     read-timeout: 30s
     write-timeout: 2s
+logging:
+  level:
+    ru.otus: DEBUG
