@@ -1,2 +1,5 @@
 server:
   port: 8182
+springdoc:
+  swagger-ui:
+    path: /swagger

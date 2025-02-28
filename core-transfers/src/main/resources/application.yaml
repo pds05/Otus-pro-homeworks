@@ -23,6 +23,13 @@ integrations:
     url: http://localhost:8080/api/v1/limits
     read-timeout: 30s
     write-timeout: 2s
+  base:
+    url: http://localhost:8182/api/v1
+    read-timeout: 5s
+    connect-timeout: 1s
+springdoc:
+  swagger-ui:
+    path: /swagger
 logging:
   level:
     org.zalando.logbook.Logbook: TRACE

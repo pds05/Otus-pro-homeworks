@@ -3,3 +3,6 @@ server:
 spring:
   application:
     name: mt-limits
+springdoc:
+  swagger-ui:
+    path: /swagger
