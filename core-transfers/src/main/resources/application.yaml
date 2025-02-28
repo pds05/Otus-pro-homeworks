@@ -1,0 +1,28 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: mt-core-transfers
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/mt_core_transfers
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+    open-in-view: false
+transfers:
+  max-transfer-sum: 100.00
+  demo-transfers-enabled: false
+  blocked-account-numbers:
+    - "123"
+    - "234"
+    - "456"
+integrations:
+  limits:
+    url: http://localhost:8080/api/v1/limits
+    read-timeout: 30s
+    write-timeout: 2s
+logging:
+  level:
+    org.zalando.logbook.Logbook: TRACE

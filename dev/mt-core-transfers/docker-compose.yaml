@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  core-transfers-postgres:
+    image: postgres_custom_ru:latest
+    container_name: core-transfers-postgres
+    ports:
+      - "5450:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-U", "postgres"]
+      interval: 5s
+      timeout: 1s
+      retries: 3
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01.sql
