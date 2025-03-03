@@ -1,0 +1,27 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://core-transfers-postgres:5432/mt_core_transfers?minimumIdle=2
+    username: mt_core_transfers_admin
+    password: mt_core_transfers_admin
+    hikari:
+      minimumIdle: 2
+      maximumPoolSize: 4
+  jpa:
+    show-sql: true
+    open-in-view: false
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+integrations:
+  limits:
+    url: http://localhost:8182/api/v1/limits
+    read-timeout: 30s
+    write-timeout: 2s
