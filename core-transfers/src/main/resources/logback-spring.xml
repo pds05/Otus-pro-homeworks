@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc />
+                <context />
+                <logLevel />
+                <loggerName />
+                <pattern>
+                    <pattern>
+                        {
+                        "app": "mt-core-transfers"
+                        }
+                    </pattern>
+                </pattern>
+                <threadName />
+                <message />
+                <logstashMarkers />
+                <stackTrace />
+            </providers>
+        </encoder>
+    </appender>
+    <appender name="logstash_docker" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>logstash_springboot:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc />
+                <context />
+                <logLevel />
+                <loggerName />
+                <pattern>
+                    <pattern>
+                        {
+                        "app": "mt-core-transfers"
+                        }
+                    </pattern>
+                </pattern>
+                <threadName />
+                <message />
+                <logstashMarkers />
+                <stackTrace />
+            </providers>
+        </encoder>
+    </appender>
+<!--    <root level="info">-->
+<!--        <appender-ref ref="logstash" />-->
+<!--        <appender-ref ref="logstash_docker" />-->
+<!--    </root>-->
+    <springProfile name="!docker">
+        <root level="info">
+            <appender-ref ref="logstash" />
+        </root>
+    </springProfile>
+    <springProfile name="docker">
+        <root level="info">
+            <appender-ref ref="logstash_docker" />
+        </root>
+    </springProfile>
+</configuration>

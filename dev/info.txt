@@ -1,0 +1,37 @@
+### DOCKER - LAUNCH INSTRUCTIONS ###
+
+### POSTGRES ###
+# create image
+docker build . -t mt/postgres_custom_ru
+
+# run docker-compose service
+
+### NETWORK ###
+# if run 'core-transfers-app' service without docker-compose for connection to DB
+docker network create mt-inter-containers
+
+### MT-LIMITS ###
+# Active profile attached to image. No need to specify separately
+-Dspring.profiles.active=docker
+
+# create image
+docker build . -t mt/limits-app
+
+# if run in separate container outside docker-compose
+docker run -d --name mt-limits --network mt-inter-containers mt/limits-app:latest
+
+### MT-CORE-TRANSFER ###
+# Active profile attached to image. No need to specify separately
+-Dspring.profiles.active=docker
+
+# create image
+docker build . -t mt/core-transfers-app
+
+# if run in separate container outside docker-compose
+docker run -d --name mt-core-transfers -p 8080:8080 --network mt-inter-containers mt/core-transfers-app:latest
+
+# run docker-compose service 'core-transfers-app' or separate docker containers
+
+http://localhost:8189/swagger-ui/index.html
+
+https://editor.swagger.io/
