@@ -1,9 +1,7 @@
 package ru.otus.java.pro.mt.core.transfers.configs.properties;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.math.BigDecimal;
 import java.util.Set;
