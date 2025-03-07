@@ -18,7 +18,7 @@ public class LimitsIntegrationRestTemplateImpl implements LimitsIntegration {
     private final RestTemplate commonRestTemplate;
     private final LimitsIntegrationProperties limitsIntegrationProperties;
 
-    public RemainingLimitDto getRemainingLimit(String clientId) {
+    public RemainingLimitDto getRemainingLimit(String clientId, String accountId) {
         try {
             RemainingLimitDto remainingLimit = commonRestTemplate.getForObject(limitsIntegrationProperties.getUrl(), RemainingLimitDto.class);
             return remainingLimit;

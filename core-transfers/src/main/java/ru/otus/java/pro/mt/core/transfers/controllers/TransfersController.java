@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.otus.java.pro.mt.core.transfers.configs.properties.TransfersProperties;
 import ru.otus.java.pro.mt.core.transfers.dtos.ExecuteTransferDtoRq;
 import ru.otus.java.pro.mt.core.transfers.dtos.TransferDto;
 import ru.otus.java.pro.mt.core.transfers.dtos.TransfersPageDto;
@@ -16,6 +17,8 @@ import ru.otus.java.pro.mt.core.transfers.exceptions_handling.ErrorDto;
 import ru.otus.java.pro.mt.core.transfers.exceptions_handling.ResourceNotFoundException;
 import ru.otus.java.pro.mt.core.transfers.services.TransfersService;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Переводы", description = "Методы работы с переводами")
 public class TransfersController {
     private final TransfersService transfersService;
+    private final TransfersProperties transfersProperties;
 
     private static final Function<Transfer, TransferDto> ENTITY_TO_DTO = t -> new TransferDto(t.getId(), t.getClientId(), t.getTargetClientId(), t.getSourceAccount(), t.getTargetAccount(), t.getMessage(), t.getAmount());
 
@@ -40,11 +44,17 @@ public class TransfersController {
     )
     public TransfersPageDto getAllTransfers(
             @Parameter(description = "Идентификатор клиента", required = true, schema = @Schema(type = "string", maxLength = 10, example = "1234567890"))
-            @RequestHeader(name = "client-id") String clientId
+            @RequestHeader(name = "client-id") String clientId,
+            @Parameter(description = "Номер страницы", required = true, schema = @Schema(type = "string", maximum = "1000"))
+            @RequestParam(value = "page-size", required = false) Integer pageSize,
+            @RequestParam(value = "page") Integer page
     ) {
+        AtomicReference<Integer> offset = new AtomicReference<>();
+        Optional.ofNullable(pageSize).ifPresentOrElse(num -> offset.set(Math.min(num, transfersProperties.getPagingOffset().getMaximumValue())),
+                () -> offset.set(transfersProperties.getPagingOffset().getDefaultValue()));
         return new TransfersPageDto(
                 transfersService
-                        .getAllTransfers(clientId)
+                        .getAllTransfers(clientId, page, offset.get())
                         .stream()
                         .map(ENTITY_TO_DTO).collect(Collectors.toList())
         );

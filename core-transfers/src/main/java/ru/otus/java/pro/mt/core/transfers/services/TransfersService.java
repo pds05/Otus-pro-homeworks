@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface TransfersService {
     Optional<Transfer> getTransferById(String id, String clientId);
-    List<Transfer> getAllTransfers(String clientId);
+    List<Transfer> getAllTransfers(String clientId, Integer page, Integer offset);
     void execute(String clientId, ExecuteTransferDtoRq executeTransferDtoRq);
     void save(Transfer transfer);
 }

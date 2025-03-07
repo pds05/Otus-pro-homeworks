@@ -1,11 +1,26 @@
 version: '3.8'
 
 services:
+  core-transfers-app:
+    ports:
+      - "8080:8080"
+    image: mt/core-transfers-app:latest
+    container_name: mt-core-transfers
+    depends_on:
+      - core-transfers-postgres
+      - limits-app
+  limits-app:
+    image: mt/limits-app:latest
+    container_name: mt-limits
+
   core-transfers-postgres:
-    image: postgres_custom_ru:latest
+    image: mt/postgres_custom_ru:latest
     container_name: core-transfers-postgres
     ports:
       - "5450:5432"
+    networks:
+      - mt-inter-containers
+      - default
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -15,7 +30,7 @@ services:
       timeout: 1s
       retries: 3
     volumes:
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01.sql
+      - ./postgres/:/docker-entrypoint-initdb.d
 
   elasticsearch:
     # Просто через docker pull elasticsearch:8.7.1
@@ -64,10 +79,13 @@ services:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - elastic
+      - default
     depends_on:
       - elasticsearch
 
 networks:
+  mt-inter-containers:
+    external: true
   elastic:
     driver: bridge
 

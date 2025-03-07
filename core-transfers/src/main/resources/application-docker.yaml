@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  application:
+    name: mt-core-transfers
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://core-transfers-postgres:5432/mt_core_transfers?minimumIdle=2
@@ -13,15 +15,25 @@ spring:
     show-sql: true
     open-in-view: false
 management:
-  endpoint:
-    health:
-      show-details: always
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: prometheus,health,info,metric
+  endpoint:
+    health:
+      show-details: always
+transfers:
+  max-transfer-sum: 1000.00
+  demo-transfers-enabled: false
+  blocked-account-numbers:
+    - "123"
+    - "234"
+    - "456"
+  paging-offset:
+    default-value: 20
+    maximum-value: 1000
 integrations:
   limits:
-    url: http://localhost:8182/api/v1/limits
+    url: http://mt-limits:8080/api/v1/limits
     read-timeout: 30s
     write-timeout: 2s

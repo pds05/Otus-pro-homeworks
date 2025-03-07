@@ -1,4 +1,4 @@
-create table transfers (
+create table if not exists transfers (
     id varchar(36) primary key,
     client_id varchar(10),
     target_client_id varchar(10),

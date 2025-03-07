@@ -20,6 +20,10 @@ management:
     web:
       exposure:
         include: '*'
+transfers:
+  paging-offset:
+    default-value: 20
+    maximum-value: 1000
 integrations:
   limits:
     url: http://localhost:8182/api/v1/limits
