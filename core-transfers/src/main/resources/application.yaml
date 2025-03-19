@@ -23,11 +23,11 @@ integrations:
   statistics:
     url: http://localhost:8083/api/v1/statistics
     read-timeout: 10s
-    write-timeout: 5s
+    connect-timeout: 5s
   limits:
     url: http://localhost:8082/api/v1/limits
     read-timeout: 30s
-    write-timeout: 2s
+    connect-timeout: 2s
   base:
     url: http://localhost:8182/api/v1
     read-timeout: 5s
