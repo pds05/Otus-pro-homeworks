@@ -11,24 +11,53 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import ru.otus.java.pro.mt.core.transfers.configs.properties.LimitsIntegrationProperties;
 import ru.otus.java.pro.mt.core.transfers.configs.properties.RestClientProperties;
+import ru.otus.java.pro.mt.core.transfers.configs.properties.StatisticsIntegrationProperties;
 
 @Configuration
 public class RestClientsConfig {
-    public static final String LIMITS_REST_CLIENT = "limitsClient";
-    public static final String BASE_REST_CLIENT = "restClient";
-
-    private static final String REST_CLIENT_FACTORY = "restClientFactory";
+    private static final String BASE_REST_CLIENT_FACTORY = "baseRestClientFactory";
+    private static final String LIMITS_REST_CLIENT_FACTORY = "limitsRestClientFactory";
+    private static final String STAT_REST_CLIENT_FACTORY = "statRestClientFactory";
+    public static final String BASE_REST_CLIENT = "baseRestClient";
+    public static final String LIMITS_REST_CLIENT = "limitsRestClient";
+    public static final String STATISTICS_REST_CLIENT = "statRestClient";
 
     // @Bean
     public RestTemplate commonRestTemplate() {
         return new RestTemplate();
     }
 
+    @Bean(STAT_REST_CLIENT_FACTORY)
+    public ClientHttpRequestFactory statisticsHttpRequestFactory(StatisticsIntegrationProperties properties) {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(properties.getConnectTimeout());
+        factory.setReadTimeout(properties.getReadTimeout());
+        return factory;
+    }
+
+    @Bean(STATISTICS_REST_CLIENT)
+    public RestClient statisticsClient(@Qualifier(STAT_REST_CLIENT_FACTORY) ClientHttpRequestFactory requestFactory,
+                                       StatisticsIntegrationProperties properties) {
+        return RestClient.builder()
+                .requestFactory(requestFactory)
+                .baseUrl(properties.getUrl())
+                .build();
+    }
+
+    @Bean(LIMITS_REST_CLIENT_FACTORY)
+    public ClientHttpRequestFactory limitsHttpRequestFactory(LimitsIntegrationProperties properties) {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(properties.getConnectTimeout());
+        factory.setReadTimeout(properties.getReadTimeout());
+        return factory;
+    }
+
     @Bean(LIMITS_REST_CLIENT)
     @ConditionalOnMissingBean(RestTemplate.class)
-    public RestClient limitsClient(LimitsIntegrationProperties properties) {
+    public RestClient limitsClient(@Qualifier(LIMITS_REST_CLIENT_FACTORY) ClientHttpRequestFactory requestFactory,
+                                   LimitsIntegrationProperties properties) {
         return RestClient.builder()
-                .requestFactory(new HttpComponentsClientHttpRequestFactory())
+                .requestFactory(requestFactory)
                 .baseUrl(properties.getUrl())
 //                .defaultUriVariables(Map.of("variable", "foo"))
 //                .defaultHeader("My-Header", "Foo")
@@ -37,9 +66,9 @@ public class RestClientsConfig {
                 .build();
     }
 
-    @Bean(REST_CLIENT_FACTORY)
+    @Bean(BASE_REST_CLIENT_FACTORY)
     @ConditionalOnMissingBean(RestTemplate.class)
-    public ClientHttpRequestFactory customHttpRequestFactory(RestClientProperties properties) {
+    public ClientHttpRequestFactory baseHttpRequestFactory(RestClientProperties properties) {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(properties.getConnectTimeout());
         factory.setReadTimeout(properties.getReadTimeout());
@@ -47,8 +76,8 @@ public class RestClientsConfig {
     }
 
     @Bean(BASE_REST_CLIENT)
-    @ConditionalOnBean(name = REST_CLIENT_FACTORY)
-    public RestClient restClient(@Qualifier(REST_CLIENT_FACTORY) ClientHttpRequestFactory requestFactory,
+    @ConditionalOnBean(name = BASE_REST_CLIENT_FACTORY)
+    public RestClient restClient(@Qualifier(BASE_REST_CLIENT_FACTORY) ClientHttpRequestFactory requestFactory,
                                  RestClientProperties properties) {
         return RestClient.builder()
                 .baseUrl(properties.getUrl())

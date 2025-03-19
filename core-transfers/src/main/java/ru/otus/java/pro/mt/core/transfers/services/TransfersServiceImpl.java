@@ -21,6 +21,7 @@ public class TransfersServiceImpl implements TransfersService {
     private final TransferRequestValidator transferRequestValidator;
     private final TransfersProperties transfersProperties;
     private final LimitsServiceImpl limitsService;
+    private final StatisticsService statisticsService;
 
     @Override
     public Optional<Transfer> getTransferById(String id, String clientId) {
@@ -50,6 +51,7 @@ public class TransfersServiceImpl implements TransfersService {
                 executeTransferDtoRq.getMessage(),
                 BigDecimal.ONE);
         save(transfer);
+        if (transfersProperties.isSendStatistics()) statisticsService.send(transfer.toString());
     }
 
     @Override

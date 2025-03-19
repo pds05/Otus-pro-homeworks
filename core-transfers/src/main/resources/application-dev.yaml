@@ -26,6 +26,10 @@ integrations:
     url: http://localhost:8182/api/v1
     read-timeout: 5s
     connect-timeout: 1s
+  statistics:
+    url: http://localhost:8083/api/v1/statistics
+    read-timeout: 10s
+    write-timeout: 5s
 springdoc:
   swagger-ui:
     path: /swagger
