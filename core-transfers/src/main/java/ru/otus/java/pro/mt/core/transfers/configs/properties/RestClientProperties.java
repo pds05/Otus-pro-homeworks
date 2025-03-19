@@ -8,9 +8,9 @@ import java.time.Duration;
 
 @Data
 @NoArgsConstructor
-@ConfigurationProperties(prefix = "integrations.limits")
-public class LimitsIntegrationProperties {
+@ConfigurationProperties(prefix = "integrations.base")
+public class RestClientProperties {
     private String url;
-    private Duration readTimeout;
     private Duration connectTimeout;
+    private Duration readTimeout;
 }

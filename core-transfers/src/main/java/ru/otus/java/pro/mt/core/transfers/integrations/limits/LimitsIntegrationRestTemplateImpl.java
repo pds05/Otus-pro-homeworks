@@ -1,7 +1,6 @@
 package ru.otus.java.pro.mt.core.transfers.integrations.limits;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;

@@ -21,6 +21,7 @@ public class TransfersServiceImpl implements TransfersService {
     private final TransferRequestValidator transferRequestValidator;
     private final TransfersProperties transfersProperties;
     private final LimitsServiceImpl limitsService;
+    private final StatisticsService statisticsService;
 
     @Override
     public Optional<Transfer> getTransferById(String id, String clientId) {
@@ -42,8 +43,15 @@ public class TransfersServiceImpl implements TransfersService {
         if (executeTransferDtoRq.getAmount().compareTo(transfersProperties.getMaxTransferSum()) > 0) {
             throw new BusinessLogicException("OOPS", "OOPS_CODE");
         }
-        Transfer transfer = new Transfer(UUID.randomUUID().toString(), "1", "2", "1", "2", "Demo", BigDecimal.ONE);
+        Transfer transfer = new Transfer(UUID.randomUUID().toString(),
+                clientId,
+                executeTransferDtoRq.getTargetClientId(),
+                executeTransferDtoRq.getSourceAccount(),
+                executeTransferDtoRq.getTargetAccount(),
+                executeTransferDtoRq.getMessage(),
+                BigDecimal.ONE);
         save(transfer);
+        if (transfersProperties.isSendStatistics()) statisticsService.send(transfer.toString());
     }
 
     @Override

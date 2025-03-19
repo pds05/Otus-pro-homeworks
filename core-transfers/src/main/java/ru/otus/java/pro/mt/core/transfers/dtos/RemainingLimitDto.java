@@ -10,5 +10,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RemainingLimitDto {
+    private String clientId;
     private BigDecimal remainingLimit;
 }

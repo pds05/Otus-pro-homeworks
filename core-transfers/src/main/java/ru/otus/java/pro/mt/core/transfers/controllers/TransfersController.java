@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.java.pro.mt.core.transfers.dtos.ExecuteTransferDtoRq;
 import ru.otus.java.pro.mt.core.transfers.dtos.TransferDto;
@@ -14,6 +15,7 @@ import ru.otus.java.pro.mt.core.transfers.dtos.TransfersPageDto;
 import ru.otus.java.pro.mt.core.transfers.entities.Transfer;
 import ru.otus.java.pro.mt.core.transfers.exceptions_handling.ErrorDto;
 import ru.otus.java.pro.mt.core.transfers.exceptions_handling.ResourceNotFoundException;
+import ru.otus.java.pro.mt.core.transfers.exceptions_handling.ValidationErrorDto;
 import ru.otus.java.pro.mt.core.transfers.services.TransfersService;
 
 import java.util.function.Function;
@@ -34,7 +36,8 @@ public class TransfersController {
             responses = {
                     @ApiResponse(
                             description = "Успешный ответ", responseCode = "200",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransfersPageDto.class))
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = TransfersPageDto.class))
                     )
             }
     )
@@ -75,7 +78,18 @@ public class TransfersController {
     }
 
     @PostMapping
-    @Operation(summary = "Запрос на исполнение перевода")
+    @Operation(summary = "Запрос на исполнение перевода",
+            responses = {
+                    @ApiResponse(
+                            description = "Успешный ответ", responseCode = "201",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransferDto.class))
+                    ),
+                    @ApiResponse(
+                            description = "Запрос не прошел валидацию", responseCode = "422",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ValidationErrorDto.class))
+                    )
+            })
+    @ResponseStatus(HttpStatus.CREATED)
     public void executeTransfer(
             @Parameter(description = "Идентификатор клиента", required = true, schema = @Schema(type = "string", maxLength = 10, example = "1234567890"))
             @RequestHeader(name = "client-id") String clientId,

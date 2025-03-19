@@ -8,8 +8,8 @@ import java.time.Duration;
 
 @Data
 @NoArgsConstructor
-@ConfigurationProperties(prefix = "integrations.limits")
-public class LimitsIntegrationProperties {
+@ConfigurationProperties("integrations.statistics")
+public class StatisticsIntegrationProperties {
     private String url;
     private Duration readTimeout;
     private Duration connectTimeout;

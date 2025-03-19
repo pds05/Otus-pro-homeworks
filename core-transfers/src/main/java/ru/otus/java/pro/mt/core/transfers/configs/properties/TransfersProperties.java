@@ -13,4 +13,5 @@ public class TransfersProperties {
     private BigDecimal maxTransferSum;
     private boolean maxTransfersEnabled;
     private Set<String> blockedAccountNumbers;
+    private boolean sendStatistics;
 }
